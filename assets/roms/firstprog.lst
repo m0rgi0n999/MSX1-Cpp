@@ -1,0 +1,28 @@
+.z80
+.org 0x0000          ; Code runs at memory address 0x0000 (MSX Start)
+
+; ---Z80 ASSEMBLY PROGRAM START---
+
+; Set VRAM Address to 0x2000 (Arbitrary location for fun)
+ld a, 0x00           ; Load low byte of address into A
+    ^ ***ERROR*** unknown instruction
+out (0x99), a        ; Send to VDP Port 0x99 (First byte of command)
+     ^ ***ERROR*** instruction expected
+ld a, 0x20           ; Load high byte of address (0x20 = 32)
+    ^ ***ERROR*** unknown instruction
+out (0x99), a        ; Send to VDP Port 0x99 (Second byte)
+     ^ ***ERROR*** instruction expected
+
+; Write the value 0xFF to that address
+ld a, 0xFF           ; Value to Write
+    ^ ***ERROR*** unknown instruction
+out (0x98), a        ; Send to VDP Port 0x98 (Write to VRAM)
+     ^ ***ERROR*** instruction expected
+
+; Infinite Loop (Halt the system)
+jr $                 ; jump to self (relatively nearest location)
+    ^ ***ERROR*** instruction expected
+
+
+total time: 0.0006 sec.
+7 errors
