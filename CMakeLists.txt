@@ -32,3 +32,19 @@ add_executable(msx-emulator ${SOURCES})
 find_package(Threads REQUIRED)
 target_link_libraries(msx-emulator Threads::Threads)
 
+# fetch Catch2
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+# Enable testin support
+include (CTest)
+enable_testing()
+
+add_subdirectory(tests)

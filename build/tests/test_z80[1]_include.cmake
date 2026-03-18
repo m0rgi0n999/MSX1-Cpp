@@ -1,0 +1,5 @@
+if(EXISTS "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/tests/test_z80[1]_tests.cmake")
+  include("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/tests/test_z80[1]_tests.cmake")
+else()
+  add_test(test_z80_NOT_BUILT test_z80_NOT_BUILT)
+endif()

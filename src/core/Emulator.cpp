@@ -2,62 +2,62 @@
 #include "io/FileManager.hpp"
 #include <iostream>
 
-Emulator::Emulator() {
-    // 1. Set Memory Callbacks (RAM/ROM)
-    z80.SetMemoryCallbacks(
-        [this](uint16_t addr) { return this->bus.Read(addr); },
-        [this](uint16_t addr, uint8_t val) { this->bus.Write(addr, val); }
-    );
+// =============================
+//  Z80 <-> BUS BRIDGE FUNCTIONS
+// =============================
 
-    // 2. Set I/O Callbacks (Ports for VDP/PSG)
-    z80.SetIOCallbacks(
-        [this](uint8_t port) { return this->bus.IO_Read(port); },  // Fixed: use port
-        [this](uint8_t port, uint8_t val) { this->bus.IO_Write(port, val); } // Fixed: use port
-    );
+static Emulator* g_emulator = nullptr;
+
+static uint8_t Z80_MemRead(uint16_t addr) {
+    return g_emulator->bus.Read(addr);
+}
+
+static void Z80_MemWrite(uint16_t addr, uint8_t value) {
+    g_emulator->bus.Write(addr, value);
+}
+
+static uint8_t Z80_IORead(uint8_t port) {
+    return g_emulator->bus.ReadIO(port);
+}
+
+static void Z80_IOWrite(uint8_t port, uint8_t value) {
+    g_emulator->bus.WriteIO(port, value);
+}
+
+Emulator::Emulator()
+{
+    // Make this instance available for static callbacks
+    g_emulator = this;
+
+    // Connect Z80 to BUS using plain function pointers
+    z80.readMemory  = Z80_ReadMem;
+    z80.writeMemory = Z80_WriteMem;
+    z80.readIO      = Z80_ReadIO;
+    z80.writeIO     = Z80_WriteIO;
 
     z80.Reset();
 
-    // --- MAP IO DEVICES ---
-    // Connect TMS9918 to Port 0x98 (Data) and 0x99 (Command)
+    // -------------------------
+    // MAP IO DEVICES
+    // -------------------------
+
     bus.MapIO(0x98,
-        [this](uint8_t port) { return this->vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { this->vdp.Write(port, val); }
+        uint8_t port { return vdp.Read(port); },
+        [this](uint8_t port, uint8_t value) { vdp.Write(port, value); }
     );
 
     bus.MapIO(0x99,
-        [this](uint8_t port) { return this->vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { this->vdp.Write(port, val); }
+        [this](uint8_t port) { return vdp.Read(port); },
+        [this](uint8_t port, uint8_t value) { vdp.Write(port, value); }
     );
 
-    // Connect AY8910 to port 0xA0 (Latch/Address) and 0xA1 (Read/Write Data)
     bus.MapIO(0xA0,
-        [this](uint8_t port) { return this->psg.Read(port); },
-        [this](uint8_t port, uint8_t val) { this->psg.Write(port, val); }
+        [this](uint8_t port) { return psg.Read(port); },
+        [this](uint8_t port, uint8_t value) { psg.Write(port, value); }
     );
 
     bus.MapIO(0xA1,
-        [this](uint8_t port) { return this->psg.Read(port); },
-        [this](uint8_t port, uint8_t val) { this->psg.Write(port, val); }
+        [this](uint8_t port) { return psg.Read(port); },
+        [this](uint8_t port, uint8_t value) { psg.Write(port, value); }
     );
 }
-
-
-void Emulator::LoadSystemROM(const std::string& biosPath) {
-    auto biosData = FileManager::LoadROM(biosPath);
-    if (biosData.empty()) {
-        std::cerr << "Failed to load BIOS ROM: " << biosPath << std::endl;
-        return;
-    }
-    bus.LoadToRAM(0x0000, biosData);
-    std::cout << "BIOS Loaded. Size: " << biosData.size() << " bytes." << std::endl;
-}
-
-void Emulator::RunFrame() {
-    // A very basic loop
-    for(int i = 0; i < 100000; ++i) {
-        uint32_t cycles = z80.ExecuteInstruction();
-        (void)cycles; // Silences the "unused variable" warning
-        // We would pass these cycles to vdp.Update(cycles) here in the future
-    }
-}
-
