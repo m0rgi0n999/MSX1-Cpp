@@ -96,6 +96,7 @@ test_z80_EXTERNAL_OBJECTS =
 tests/test_z80: tests/CMakeFiles/test_z80.dir/test_z80.cpp.o
 tests/test_z80: tests/CMakeFiles/test_z80.dir/build.make
 tests/test_z80: tests/CMakeFiles/test_z80.dir/compiler_depend.ts
+tests/test_z80: libmsx_emulator_core.a
 tests/test_z80: lib/libgtest_main.a
 tests/test_z80: lib/libgtest.a
 tests/test_z80: tests/CMakeFiles/test_z80.dir/link.txt

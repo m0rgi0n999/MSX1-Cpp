@@ -19,6 +19,9 @@ public:
     // Execute one frame of emulation (until VSync)
     void RunFrame();
 
+    // Debugging helpers
+    void EnableOpcodeTrace(bool enabled);
+
     // Get pointers to subsystems if you need to access them from outside (e.g., GUI)
     // TMS9918* GetVDP() { return &vdp; }
     const TMS9918& GetVDP() const { return vdp; }

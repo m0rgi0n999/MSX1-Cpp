@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src -I/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/include -isystem /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include -isystem /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest
+CXX_INCLUDES = -I/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/include -I/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src -isystem /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include -isystem /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest
 
 CXX_FLAGS = -std=gnu++20 -Wall -Wextra -Wpedantic
 

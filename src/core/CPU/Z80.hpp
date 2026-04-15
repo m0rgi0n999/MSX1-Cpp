@@ -40,13 +40,47 @@ public:
     ReadIOFunc   readIO;
     WriteIOFunc  writeIO;
 
+    // ================================
+    // Registers (public for unit tests)
+    // ================================
+    uint8_t A, F;
+    uint8_t B, C;
+    uint8_t D, E;
+    uint8_t H, L;
+    uint16_t IX, IY;
+
+    uint16_t PC;
+    uint16_t SP;
+
+    bool traceOpcodes = false;
+    bool traceUnimplementedOpcodes = false;
+    uint32_t executedInstructionCount = 0;
+    uint32_t unimplementedInstructionCount = 0;
+    uint32_t unimplementedCBCount = 0;
+    uint32_t unimplementedEDCount = 0;
+
+    void DumpOpcodeStats() const;
+
+    // ================================
+    // Flag bits
+    // ================================
+    static constexpr uint8_t FLAG_C = 0x01;
+    static constexpr uint8_t FLAG_N = 0x02;
+    static constexpr uint8_t FLAG_P = 0x04;
+    static constexpr uint8_t FLAG_X = 0x08;
+    static constexpr uint8_t FLAG_H = 0x10;
+    static constexpr uint8_t FLAG_Y = 0x20;
+    static constexpr uint8_t FLAG_Z = 0x40;
+    static constexpr uint8_t FLAG_S = 0x80;
+
 private:
     // ================================
     // Opcode execution
     // ================================
-    uint32_t ExecuteMain(uint8_t opcode);
+    uint32_t ExecuteMain(uint8_t opcode, bool useIX, bool useIY);
     uint32_t ExecuteCB(uint8_t opcode);
     uint32_t ExecuteED(uint8_t opcode);
+    uint32_t ExecuteCBIndexed(uint16_t index, int8_t d, uint8_t cbOpcode);
 
     // Instruction helpers
     uint32_t DoLoadRegToReg(uint8_t opcode);
@@ -54,16 +88,13 @@ private:
     uint32_t Do_RLC(uint8_t opcode);
     uint8_t& GetReg(uint8_t code);
 
-    // ================================
-    // Registers
-    // ================================
-    uint8_t A, F;
-    uint8_t B, C;
-    uint8_t D, E;
-    uint8_t H, L;
+    uint16_t HLAddress() const;
+    uint16_t DEAddress() const;
+    uint8_t ReadHL();
+    void WriteHL(uint8_t code);
+    void WriteDE(uint8_t code);
 
-    uint16_t PC;
-    uint16_t SP;
+    void LogOpcode(uint8_t opcode, bool implemented, const char* prefix = nullptr);
 
     // ================================
     // Fetch & Stack
@@ -82,16 +113,13 @@ private:
     void SetHalfCarryFlag(uint8_t result, uint8_t op1, uint8_t op2);
     void SetCarryFlag(uint16_t result);
     void SetParityFlag(uint8_t value);
-
-    // ================================
-    // Flag bits
-    // ================================
-    static constexpr uint8_t FLAG_C = 0x01;
-    static constexpr uint8_t FLAG_N = 0x02;
-    static constexpr uint8_t FLAG_P = 0x04;
-    static constexpr uint8_t FLAG_X = 0x08;
-    static constexpr uint8_t FLAG_H = 0x10;
-    static constexpr uint8_t FLAG_Y = 0x20;
-    static constexpr uint8_t FLAG_Z = 0x40;
-    static constexpr uint8_t FLAG_S = 0x80;
 };
+
+inline constexpr uint8_t FLAG_C = Z80::FLAG_C;
+inline constexpr uint8_t FLAG_N = Z80::FLAG_N;
+inline constexpr uint8_t FLAG_P = Z80::FLAG_P;
+inline constexpr uint8_t FLAG_X = Z80::FLAG_X;
+inline constexpr uint8_t FLAG_H = Z80::FLAG_H;
+inline constexpr uint8_t FLAG_Y = Z80::FLAG_Y;
+inline constexpr uint8_t FLAG_Z = Z80::FLAG_Z;
+inline constexpr uint8_t FLAG_S = Z80::FLAG_S;

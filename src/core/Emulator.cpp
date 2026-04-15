@@ -2,62 +2,87 @@
 #include "io/FileManager.hpp"
 #include <iostream>
 
-// =============================
-//  Z80 <-> BUS BRIDGE FUNCTIONS
-// =============================
-
-static Emulator* g_emulator = nullptr;
-
-static uint8_t Z80_MemRead(uint16_t addr) {
-    return g_emulator->bus.Read(addr);
-}
-
-static void Z80_MemWrite(uint16_t addr, uint8_t value) {
-    g_emulator->bus.Write(addr, value);
-}
-
-static uint8_t Z80_IORead(uint8_t port) {
-    return g_emulator->bus.ReadIO(port);
-}
-
-static void Z80_IOWrite(uint8_t port, uint8_t value) {
-    g_emulator->bus.WriteIO(port, value);
-}
-
 Emulator::Emulator()
 {
-    // Make this instance available for static callbacks
-    g_emulator = this;
+    // Z80 MEMORY CALLBACKS -> BUS
+    z80.readMemory = [this](uint16_t addr) {
+        return bus.Read(addr);
+    };
 
-    // Connect Z80 to BUS using plain function pointers
-    z80.readMemory  = Z80_ReadMem;
-    z80.writeMemory = Z80_WriteMem;
-    z80.readIO      = Z80_ReadIO;
-    z80.writeIO     = Z80_WriteIO;
+    z80.writeMemory = [this](uint16_t addr, uint8_t value) {
+        bus.Write(addr, value);
+    };
+
+    // Z80 IO CALLBACKS -> BUS
+    z80.readIO = [this](uint8_t port) {
+        return bus.IO_Read(port);
+    };
+
+    z80.writeIO = [this](uint8_t port, uint8_t value) {
+        bus.IO_Write(port, value);
+    };
 
     z80.Reset();
 
-    // -------------------------
     // MAP IO DEVICES
-    // -------------------------
 
-    bus.MapIO(0x98,
-        uint8_t port { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t value) { vdp.Write(port, value); }
-    );
-
-    bus.MapIO(0x99,
+    // VDP DATA (0x98)
+    bus.MapIO(
+        0x98,
         [this](uint8_t port) { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t value) { vdp.Write(port, value); }
+        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
     );
 
-    bus.MapIO(0xA0,
-        [this](uint8_t port) { return psg.Read(port); },
-        [this](uint8_t port, uint8_t value) { psg.Write(port, value); }
+    // VDP CTRL (0x99)
+    bus.MapIO(
+        0x99,
+        [this](uint8_t port) { return vdp.Read(port); },
+        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
     );
 
-    bus.MapIO(0xA1,
+    // PSG ADDR (0xA0)
+    bus.MapIO(
+        0xA0,
         [this](uint8_t port) { return psg.Read(port); },
-        [this](uint8_t port, uint8_t value) { psg.Write(port, value); }
+        [this](uint8_t port, uint8_t val) { psg.Write(port, val); }
+    );
+
+    // PSG DATA (0xA1)
+    bus.MapIO(
+        0xA1,
+        [this](uint8_t port) { return psg.Read(port); },
+        [this](uint8_t port, uint8_t val) { psg.Write(port, val); }
     );
 }
+
+void Emulator::EnableOpcodeTrace(bool enabled) {
+    z80.traceOpcodes = enabled;
+}
+
+void Emulator::LoadSystemROM(const std::string& biosPath) {
+    auto rom = FileManager::LoadROM(biosPath);
+    if (rom.empty()) {
+        std::cerr << "Failed to load BIOS ROM: " << biosPath << std::endl;
+        return;
+    }
+    bus.LoadToRAM(0x0000, rom);
+}
+
+void Emulator::RunFrame() {
+    // Simple instruction batch execution for one frame.
+    uint32_t totalCycles = 0;
+    for (int i = 0; i < 1000; ++i) {
+        uint32_t cycles = z80.ExecuteInstruction();
+        totalCycles += cycles;
+    }
+
+    // Update peripherals
+    vdp.Update(totalCycles);
+    psg.Tick(totalCycles);
+
+    z80.DumpOpcodeStats();
+
+    // Dump VRAM for debugging
+    vdp.DumpVRAM(0x2000, 16);
+}
+

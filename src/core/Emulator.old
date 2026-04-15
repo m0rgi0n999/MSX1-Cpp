@@ -1,0 +1,69 @@
+#include "core/Emulator.hpp"
+#include "io/FileManager.hpp"
+#include <iostream>
+
+// =============================
+//  Z80 <-> BUS BRIDGE FUNCTIONS
+// =============================
+
+static Emulator* g_emulator = nullptr;
+
+static uint8_t Z80_MemRead(uint16_t addr) {
+    return g_emulator->bus.Read(addr);
+}
+
+static void Z80_MemWrite(uint16_t addr, uint8_t value) {
+    g_emulator->bus.Write(addr, value);
+}
+
+static uint8_t Z80_IORead(uint8_t port) {
+    return g_emulator->bus.ReadIO(port);
+}
+
+static void Z80_IOWrite(uint8_t port, uint8_t value) {
+    g_emulator->bus.WriteIO(port, value);
+}
+
+Emulator::Emulator()
+{
+    // Connect Z80 memory callbacks to Bus using lambdas
+    z80.readMemory = [this](uint16_t addr) {
+        return bus.Read(addr);
+    };
+
+    z80.writeMemory = [this](uint16_t addr, uint8_t value) {
+        bus.Write(addr, value);
+    };
+
+    // Connect Z80 IO callbacks
+    z80.readIO = uint8_t port {
+        return bus.IO_Read(port);
+    };
+
+    z80.writeIO = [this](uint8_t port, uint8_t value) {
+        bus.IO_Write(port, value);
+    };
+
+    z80.Reset();
+
+    // Map IO devices
+    bus.MapIO(0x98,
+        uint8_t port { return vdp.Read(port); },
+        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
+    );
+
+    bus.MapIO(0x99,
+        uint8_t port { return vdp.Read(port); },
+        uint8_t port, uint8_t val { vdp.Write(port, val); }
+    );
+
+    bus.MapIO(0xA0,
+        [this](uint8_t port) { return psg.Read(port); },
+        [this](uint8_t port, uint8_t val) { psg.Write(port, val); }
+    );
+
+    bus.MapIO(0xA1,
+        [this](uint8_t port) { return psg.Read(port); },
+        uint8_t port, uint8_t val { psg.Write(port, val); }
+    );
+}

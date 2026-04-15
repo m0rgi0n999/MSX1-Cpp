@@ -5,10 +5,10 @@
 // Constructor
 // -------------------------------------------------------------
 Z80::Z80()
-    : A(0), F(0), B(0), C(0), D(0), E(0), H(0), L(0),
-      PC(0), SP(0),
-      readMemory(nullptr), writeMemory(nullptr),
-      readIO(nullptr), writeIO(nullptr) 
+    : readMemory(nullptr), writeMemory(nullptr),
+      readIO(nullptr), writeIO(nullptr),
+      A(0), F(0), B(0), C(0), D(0), E(0), H(0), L(0),
+      IX(0), IY(0), PC(0), SP(0)
 {
     PC = 0x0000;
 }
@@ -21,8 +21,14 @@ void Z80::Reset() {
     B = C = 0;
     D = E = 0;
     H = L = 0;
+    IX = IY = 0;
     PC = 0x0000;
     SP = 0xFFFF;
+
+    executedInstructionCount = 0;
+    unimplementedInstructionCount = 0;
+    unimplementedCBCount = 0;
+    unimplementedEDCount = 0;
 }
 
 // -------------------------------------------------------------
@@ -78,46 +84,76 @@ uint16_t Z80::PopWord() {
 // Main Instruction Decoder
 // -------------------------------------------------------------
 uint32_t Z80::ExecuteInstruction() {
+    executedInstructionCount++;
     uint8_t opcode = FetchByte();
 
-    // Prefix handling
-    if (opcode == 0xCB)
-        return ExecuteCB(FetchByte());
-    if (opcode == 0xED)
+    bool useIX = false;
+    bool useIY = false;
+
+    if (opcode == 0xDD) {
+        useIX = true;
+        opcode = FetchByte();
+    } else if (opcode == 0xFD) {
+        useIY = true;
+        opcode = FetchByte();
+    }
+
+    if (opcode == 0xCB) {
+        if (useIX || useIY) {
+            int8_t d = static_cast<int8_t>(FetchByte());
+            uint8_t cbOpcode = FetchByte();
+            return ExecuteCBIndexed(useIX ? IX : IY, d, cbOpcode);
+        } else {
+            return ExecuteCB(FetchByte());
+        }
+    }
+
+    if (opcode == 0xED) {
         return ExecuteED(FetchByte());
+    }
 
-    // DD/FD (IX/IY) not implemented yet
-    if (opcode == 0xDD || opcode == 0xFD)
-        return 0; 
-
-    return ExecuteMain(opcode);
+    return ExecuteMain(opcode, useIX, useIY);
 }
 
 // -------------------------------------------------------------
 // ExecuteMain: The "unprefixed" 00–FF block
 // -------------------------------------------------------------
-uint32_t Z80::ExecuteMain(uint8_t opcode) {
+uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
+    auto ok = [&](uint32_t cycles) -> uint32_t {
+        LogOpcode(opcode, true);
+        return cycles;
+    };
+
+    if (opcode == 0x76) // HALT
+        return ok(4);
 
     // ---------------------------------------------------------
     // LD r,r'
     // ---------------------------------------------------------
     if ((opcode & 0xC0) == 0x40)
-        return DoLoadRegToReg(opcode);
+        return ok(DoLoadRegToReg(opcode));
 
     // ---------------------------------------------------------
     // LD r,n  (immediate)
     // ---------------------------------------------------------
     if ((opcode & 0xC7) == 0x06)
-        return DoLoadRegImm(opcode);
+        return ok(DoLoadRegImm(opcode));
 
     // ---------------------------------------------------------
     // LD r,(HL)
     // ---------------------------------------------------------
     if ((opcode & 0xC7) == 0x46) {
         uint8_t reg = (opcode >> 3) & 0x7;
-        uint16_t addr = (H << 8) | L;
-        GetReg(reg) = readMemory(addr);
-        return 7;
+        if (useIX || useIY) {
+            int8_t d = FetchByte();
+            uint16_t addr = (useIX ? IX : IY) + d;
+            GetReg(reg) = readMemory(addr);
+            return ok(19);
+        } else {
+            uint16_t addr = HLAddress();
+            GetReg(reg) = readMemory(addr);
+            return ok(7);
+        }
     }
 
     // ---------------------------------------------------------
@@ -128,9 +164,16 @@ uint32_t Z80::ExecuteMain(uint8_t opcode) {
             return 4;
 
         uint8_t src = opcode & 0x7;
-        uint16_t addr = (H << 8) | L;
-        writeMemory(addr, GetReg(src));
-        return 7;
+        if (useIX || useIY) {
+            int8_t d = FetchByte();
+            uint16_t addr = (useIX ? IX : IY) + d;
+            writeMemory(addr, GetReg(src));
+            return ok(19);
+        } else {
+            uint16_t addr = HLAddress();
+            writeMemory(addr, GetReg(src));
+            return ok(7);
+        }
     }
 
     // ---------------------------------------------------------
@@ -174,49 +217,442 @@ uint32_t Z80::ExecuteMain(uint8_t opcode) {
     switch (opcode) {
 
         case 0x00: // NOP
-            return 4;
+            return ok(4);
 
         case 0xC3: // JP nn
             PC = FetchWord();
-            return 10;
+            return ok(10);
 
         case 0xCA: { // JP Z,nn
             uint16_t addr = FetchWord();
             if (F & FLAG_Z) PC = addr;
-            return 10;
+            return ok(10);
         }
 
         case 0xD2: { // JP NC,nn
             uint16_t addr = FetchWord();
             if (!(F & FLAG_C)) PC = addr;
-            return 10;
+            return ok(10);
         }
 
         case 0xDA: { // JP C,nn
             uint16_t addr = FetchWord();
             if (F & FLAG_C) PC = addr;
-            return 10;
+            return ok(10);
         }
 
         // -----------------------------------------------------
         // I/O operations
         // -----------------------------------------------------
         case 0xD3: { // OUT (n),A
-            if (!writeIO) return 11;
+            if (!writeIO) return ok(11);
             uint8_t port = FetchByte();
             writeIO(port, A);
-            return 11;
+            return ok(11);
         }
 
         case 0xDB: { // IN A,(n)
             uint8_t port = FetchByte();
             A = readIO ? readIO(port) : 0xFF;
-            return 11;
+            return ok(11);
         }
-    }
 
-    std::cerr << "Unimplemented opcode: 0x" 
-              << std::hex << int(opcode) << "\n";
+        case 0x01: { // LD BC,nn
+            uint16_t value = FetchWord();
+            C = value & 0xFF;
+            B = value >> 8;
+            return ok(10);
+        }
+
+        case 0x11: { // LD DE,nn
+            uint16_t value = FetchWord();
+            E = value & 0xFF;
+            D = value >> 8;
+            return ok(10);
+        }
+
+        case 0x21: { // LD HL/IX/IY,nn
+            uint16_t value = FetchWord();
+            if (useIX) {
+                IX = value;
+                return ok(14);
+            } else if (useIY) {
+                IY = value;
+                return ok(14);
+            } else {
+                L = value & 0xFF;
+                H = value >> 8;
+                return ok(10);
+            }
+        }
+
+        case 0x31: { // LD SP,nn
+            SP = FetchWord();
+            return ok(10);
+        }
+
+        case 0x09: // ADD HL/IX/IY,BC
+        case 0x19: // ADD HL/IX/IY,DE
+        case 0x29: // ADD HL/IX/IY,HL/IX/IY
+        case 0x39: { // ADD HL/IX/IY,SP
+            uint16_t oldVal = useIX ? IX : useIY ? IY : HLAddress();
+            uint16_t operand = 0;
+
+            if (opcode == 0x09) operand = (B << 8) | C;
+            else if (opcode == 0x19) operand = (D << 8) | E;
+            else if (opcode == 0x29) operand = useIX ? IX : useIY ? IY : HLAddress();
+            else operand = SP;
+            
+            uint32_t result = uint32_t(oldVal) + uint32_t(operand);
+            uint32_t newVal = result & 0xFFFF;
+
+            if (useIX) IX = newVal;
+            else if (useIY) IY = newVal;
+            else {
+                H = (newVal >> 8) & 0xFF;
+                L = newVal & 0xFF;
+            }
+
+            F &= ~(FLAG_N | FLAG_H | FLAG_C);
+            if (((oldVal & 0x0FFF) + (operand & 0x0FFF)) > 0x0FFF) F |= FLAG_H;
+            if (result > 0xFFFF) F |= FLAG_C;
+
+            return ok(useIX || useIY ? 15 : 11);
+        }
+
+        case 0xC7: case 0xCF: case 0xD7: case 0xDF: case 0xE7: case 0xEF: case 0xF7: case 0xFF: {
+            // RST n
+            uint16_t addr = opcode & 0x38; // n*8
+            PushWord(PC);
+            PC = addr;
+            return ok(11);
+        }
+
+        case 0xCD: { // CALL nn
+            uint16_t addr = FetchWord();
+            PushWord(PC);
+            PC = addr;
+            return ok(17);
+        }
+
+        case 0xC4: case 0xCC: case 0xD4: case 0xDC: case 0xE4: case 0xEC: case 0xF4: case 0xFC: {
+            // CALL cc,nn
+            uint16_t addr = FetchWord();
+            bool condition = false;
+            switch (opcode & 0x38) {
+                case 0x00: condition = !(F & FLAG_Z); break; // NZ
+                case 0x08: condition = (F & FLAG_Z); break;  // Z
+                case 0x10: condition = !(F & FLAG_C); break; // NC
+                case 0x18: condition = (F & FLAG_C); break;  // C
+                case 0x20: condition = !(F & FLAG_P); break; // PO
+                case 0x28: condition = (F & FLAG_P); break;  // PE
+                case 0x30: condition = !(F & FLAG_S); break; // P
+                case 0x38: condition = (F & FLAG_S); break;  // M
+            }
+            if (condition) {
+                PushWord(PC);
+                PC = addr;
+                return ok(17);
+            } else {
+                return ok(10);
+            }
+        }
+
+        case 0xC5: // PUSH BC
+            PushWord((B << 8) | C);
+            return ok(11);
+
+        case 0xD5: // PUSH DE
+            PushWord((D << 8) | E);
+            return ok(11);
+
+        case 0xE5: // PUSH HL
+            PushWord((H << 8) | L);
+            return ok(11);
+
+        case 0xF5: // PUSH AF
+            PushWord((A << 8) | F);
+            return ok(11);
+
+        case 0xC1: { // POP BC
+            uint16_t value = PopWord();
+            C = value & 0xFF;
+            B = value >> 8;
+            return ok(10);
+        }
+
+        case 0xD1: { // POP DE
+            uint16_t value = PopWord();
+            E = value & 0xFF;
+            D = value >> 8;
+            return ok(10);
+        }
+
+        case 0xE1: { // POP HL
+            uint16_t value = PopWord();
+            L = value & 0xFF;
+            H = value >> 8;
+            return ok(10);
+        }
+
+        case 0xF1: { // POP AF
+            uint16_t value = PopWord();
+            F = value & 0xFF;
+            A = value >> 8;
+            return ok(10);
+        }
+
+        case 0xC9: // RET
+            PC = PopWord();
+            return ok(10);
+
+        case 0xC0: case 0xD0: case 0xE0: case 0xF0:
+        case 0xC8: case 0xD8: case 0xE8: case 0xF8: {
+            bool take = false;
+            switch (opcode & 0x38) {
+                case 0x00: take = !(F & FLAG_Z); break; // NZ
+                case 0x08: take =  (F & FLAG_Z); break; // Z
+                case 0x10: take = !(F & FLAG_C); break; // NC
+                case 0x18: take =  (F & FLAG_C); break; // C
+                case 0x20: take = !(F & FLAG_P); break; // PO
+                case 0x28: take =  (F & FLAG_P); break; // PE
+                case 0x30: take = !(F & FLAG_S); break; // P
+                case 0x38: take =  (F & FLAG_S); break; // M
+            }
+            if (take) {
+                PC = PopWord();
+                return ok(11);
+            }
+            return ok(5);
+        }
+
+        case 0x10: { // DJNZ e
+            int8_t offset = static_cast<int8_t>(FetchByte());
+            B--;
+            if (B != 0) {
+                PC += offset;
+                return ok(13);
+            }
+            return ok(8);
+        }
+
+        case 0x18: { // JR e
+            int8_t offset = static_cast<int8_t>(FetchByte());
+            PC += offset;
+            return ok(12);
+        }
+
+        case 0x20: // JR NZ,e
+        case 0x28: // JR Z,e
+        case 0x30: // JR NC,e
+        case 0x38: { // JR C,e
+            int8_t offset = static_cast<int8_t>(FetchByte());
+            bool take = false;
+            switch (opcode & 0x38) {
+                case 0x20: take = !(F & FLAG_Z); break;
+                case 0x28: take =  (F & FLAG_Z); break;
+                case 0x30: take = !(F & FLAG_C); break;
+                case 0x38: take =  (F & FLAG_C); break;
+            }
+            if (take) {
+                PC += offset;
+                return ok(12);
+            }
+            return ok(7);
+        }
+
+        case 0x80: case 0x81: case 0x82: case 0x83:
+        case 0x84: case 0x85: case 0x86: case 0x87: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand;
+            uint32_t cycles;
+            if (useIX || useIY) {
+                int8_t d = FetchByte();
+                operand = readMemory((useIX ? IX : IY) + d);
+                cycles = 19;
+            } else {
+                operand = (src == 6 ? ReadHL() : GetReg(src));
+                cycles = 4 + (src == 6 ? 3 : 0);
+            }
+            uint16_t result = uint16_t(A) + uint16_t(operand);
+
+            A = uint8_t(result);
+
+            F &= ~(FLAG_N | FLAG_H | FLAG_C | FLAG_Z | FLAG_S | FLAG_P);
+            if (((A & 0x0F) + (operand & 0x0F)) & 0x10) F |= FLAG_H;
+            if (result & 0x100) F |= FLAG_C;
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(cycles);
+        }
+
+        case 0x88: case 0x89: case 0x8A: case 0x8B: case 0x8C: case 0x8D: case 0x8E: case 0x8F: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+            uint16_t carry = (F & FLAG_C) ? 1 : 0;
+            uint16_t result = uint16_t(A) + uint16_t(operand) + carry;
+
+            A = uint8_t(result);
+
+            F &= ~(FLAG_N | FLAG_H | FLAG_C | FLAG_Z | FLAG_S | FLAG_P);
+            if (((A & 0x0F) + (operand & 0x0F) + carry) & 0x10) F |= FLAG_H;
+            if (result & 0x100) F |= FLAG_C;
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+    
+        case 0x98: case 0x99: case 0x9A: case 0x9B:
+        case 0x9C: case 0x9D: case 0x9E: case 0x9F: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+            uint16_t result = uint16_t(A) - uint16_t(operand);
+
+            A = uint8_t(result);
+
+            F = 0;
+            F |= FLAG_N;
+            if ((A & 0x0F) > ((A - operand) & 0x0F)) { /* borrow from bit 4 */ }
+            if ((uint8_t)(A) < operand) F |= FLAG_C;
+            if ((A & 0x0F) < (operand & 0x0F)) F |= FLAG_H; // borrow from low nibble
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+
+        case 0xA0: case 0xA1: case 0xA2: case 0xA3:
+        case 0xA4: case 0xA5: case 0xA6: case 0xA7: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+
+            A &= operand;
+
+            F = FLAG_H;
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+
+        case 0xA8: case 0xA9: case 0xAA: case 0xAB:
+        case 0xAC: case 0xAD: case 0xAE: case 0xAF: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+
+            A ^= operand;
+            F = 0;
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+
+        case 0xB0: case 0xB1: case 0xB2: case 0xB3:
+        case 0xB4: case 0xB5: case 0xB6: case 0xB7: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+
+            A |= operand;
+            F = FLAG_H;
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+
+        case 0xB8: case 0xB9: case 0xBA: case 0xBB:
+        case 0xBC: case 0xBD: case 0xBE: case 0xBF: {
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+            uint8_t result = A - operand;
+
+            F = FLAG_N;
+            if (A < operand) F |= FLAG_C;
+            if ((A & 0x0F) < (operand & 0x0F)) F |= FLAG_H;
+            SetZeroFlag(result);
+            SetSignFlag(result);
+            SetParityFlag(result);
+
+            return ok(4 + (src == 6 ? 3 : 0));
+        }
+
+        case 0x07: { // RLCA
+            uint8_t bit7 = A >> 7;
+            A = (A << 1) | bit7;
+            F &= ~(FLAG_N | FLAG_H | FLAG_C);
+            if (bit7) F |= FLAG_C;
+            return ok(4);
+        }
+
+        case 0x0F: { // RRCA
+            uint8_t bit0 = A & 1;
+            A = (A >> 1) | (bit0 << 7);
+            F &= ~(FLAG_N | FLAG_H | FLAG_C);
+            if (bit0) F |= FLAG_C;
+            return ok(4);
+        }
+
+        case 0x17: { // RLA
+            uint8_t bit7 = A >> 7;
+            A = (A << 1) | ((F & FLAG_C) ? 1 : 0);
+            F &= ~(FLAG_N | FLAG_H | FLAG_C);
+            if (bit7) F |= FLAG_C;
+            return ok(4);
+        }
+
+        case 0x1F: { // RRA
+            uint8_t bit0 = A & 1;
+            A = (A >> 1) | (((F & FLAG_C) ? 1 : 0) << 7);
+            F &= ~(FLAG_N | FLAG_H | FLAG_C);
+            if (bit0) F |= FLAG_C;
+            return ok(4);
+        }
+
+        case 0x27: { // DAA
+            uint8_t adjustment = 0;
+            if (!(F & FLAG_N)) { // after add
+                if ((A & 0x0F) > 9 || (F & FLAG_H)) adjustment |= 0x06;
+                if (A > 0x99 || (F & FLAG_C)) {
+                    adjustment |= 0x60;
+                    F |= FLAG_C;
+                } else {
+                    F &= ~FLAG_C;
+                }
+                A += adjustment;
+            } else { // after sub
+                if ((F & FLAG_H) || (A & 0x0F) > 9) adjustment |= 0x06;
+                if ((F & FLAG_C) || A > 0x99) {
+                    adjustment |= 0x60;
+                }
+                A -= adjustment;
+                // C remains
+            }
+            F &= ~(FLAG_H);
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+            return ok(4);
+        }
+
+        case 0x2F: { // CPL
+            A = ~A;
+            F |= FLAG_N | FLAG_H;
+            return ok(4);
+        }
+
+    }
+    
+    unimplementedInstructionCount++;
+    LogOpcode(opcode, false);
     return 0;
 }
 
@@ -224,22 +660,347 @@ uint32_t Z80::ExecuteMain(uint8_t opcode) {
 // CB Prefix
 // -------------------------------------------------------------
 uint32_t Z80::ExecuteCB(uint8_t opcode) {
-    // RLC r = CB 00–07
-    if ((opcode & 0xF8) == 0x00)
-        return Do_RLC(opcode);
+    uint8_t reg = opcode & 0x07;
+    bool isHL = (reg == 6);
+    uint8_t value = isHL ? ReadHL() : GetReg(reg);
+    int opType = 0; // 0=shift/rotate, 1=bit, 2=res/set
 
-    std::cerr << "Unimplemented CB opcode: 0x"
-              << std::hex << int(opcode) << "\n";
-    return 8;
+    uint8_t op = opcode >> 3;
+    switch (op) {
+        case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: { // RLC
+            uint8_t bit7 = value >> 7;
+            value = (value << 1) | bit7;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x08: case 0x09: case 0x0A: case 0x0B: case 0x0C: case 0x0D: case 0x0E: case 0x0F: { // RRC
+            uint8_t bit0 = value & 1;
+            value = (value >> 1) | (bit0 << 7);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: { // RL
+            uint8_t bit7 = value >> 7;
+            value = (value << 1) | ((F & FLAG_C) ? 1 : 0);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: { // RR
+            uint8_t bit0 = value & 1;
+            value = (value >> 1) | (((F & FLAG_C) ? 1 : 0) << 7);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: { // SLA
+            uint8_t bit7 = value >> 7;
+            value <<= 1;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x28: case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: { // SRA
+            uint8_t bit0 = value & 1;
+            uint8_t bit7 = value & 0x80;
+            value = (value >> 1) | bit7;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x38: case 0x39: case 0x3A: case 0x3B: case 0x3C: case 0x3D: case 0x3E: case 0x3F: { // SRL
+            uint8_t bit0 = value & 1;
+            value >>= 1;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        default: {
+            if ((opcode & 0xC0) == 0x40) { // BIT
+                opType = 1;
+                uint8_t bit = opcode & 0x07;
+                bool bitSet = value & (1 << bit);
+                F = (F & ~(FLAG_Z | FLAG_H | FLAG_N)) | FLAG_H;
+                if (!bitSet) F |= FLAG_Z;
+            } else if ((opcode & 0xC0) == 0x80) { // RES
+                opType = 2;
+                uint8_t bit = opcode & 0x07;
+                value &= ~(1 << bit);
+            } else if ((opcode & 0xC0) == 0xC0) { // SET
+                opType = 2;
+                uint8_t bit = opcode & 0x07;
+                value |= (1 << bit);
+            } else {
+                LogOpcode(opcode, false, "CB ");
+                return 8;
+            }
+            break;
+        }
+    }
+
+    // Write back if not BIT
+    if (opType != 1) {
+        if (isHL) {
+            WriteHL(value);
+        } else {
+            GetReg(reg) = value;
+        }
+    }
+
+    uint32_t cycles;
+    if (opType == 0) cycles = isHL ? 15 : 8;
+    else if (opType == 1) cycles = isHL ? 12 : 8;
+    else cycles = isHL ? 15 : 8;
+
+    LogOpcode(opcode, true, "CB ");
+    return cycles;
 }
 
 // -------------------------------------------------------------
 // ED Prefix
 // -------------------------------------------------------------
 uint32_t Z80::ExecuteED(uint8_t opcode) {
-    std::cerr << "Unimplemented ED opcode: 0x"
-              << std::hex << int(opcode) << "\n";
-    return 8;
+    switch (opcode) {
+        case 0x44: { // NEG
+            uint8_t oldA = A;
+            A = 0 - A;
+            F = FLAG_N;
+            if (A == 0) F |= FLAG_Z;
+            if (A & 0x80) F |= FLAG_S;
+            SetParityFlag(A);
+            if (oldA != 0) F |= FLAG_C;
+            if ((A & 0x0F) > (oldA & 0x0F)) F |= FLAG_H;
+            LogOpcode(opcode, true, "ED ");
+            return 8;
+        }
+        case 0x4D: { // RETI
+            PC = PopWord();
+            LogOpcode(opcode, true, "ED ");
+            return 14;
+        }
+        case 0x45: { // RETN
+            PC = PopWord();
+            LogOpcode(opcode, true, "ED ");
+            return 14;
+        }
+        case 0x46: case 0x4E: case 0x66: case 0x6E: { // IM 0
+            LogOpcode(opcode, true, "ED ");
+            return 8;
+        }
+        case 0x56: case 0x76: { // IM 1
+            LogOpcode(opcode, true, "ED ");
+            return 8;
+        }
+        case 0x5E: case 0x7E: { // IM 2
+            LogOpcode(opcode, true, "ED ");
+            return 8;
+        }
+        case 0xA0: { // LDI
+            uint8_t value = ReadHL();
+            WriteDE(value);
+            uint16_t hl = HLAddress() + 1;
+            H = hl >> 8;
+            L = hl & 0xFF;
+            uint16_t de = DEAddress() + 1;
+            D = de >> 8;
+            E = de & 0xFF;
+            C--;
+            F &= ~(FLAG_H | FLAG_P | FLAG_N);
+            if (C != 0) F |= FLAG_P;
+            LogOpcode(opcode, true, "ED ");
+            return 16;
+        }
+        case 0xA8: { // LDD
+            uint8_t value = ReadHL();
+            WriteDE(value);
+            uint16_t hl = HLAddress() - 1;
+            H = hl >> 8;
+            L = hl & 0xFF;
+            uint16_t de = DEAddress() - 1;
+            D = de >> 8;
+            E = de & 0xFF;
+            C--;
+            F &= ~(FLAG_H | FLAG_P | FLAG_N);
+            if (C != 0) F |= FLAG_P;
+            LogOpcode(opcode, true, "ED ");
+            return 16;
+        }
+        case 0x67: { // RRD
+            uint8_t mem = ReadHL();
+            uint8_t low = mem & 0x0F;
+            uint8_t high = (mem >> 4) & 0x0F;
+            uint8_t a_low = A & 0x0F;
+            A = (A & 0xF0) | low;
+            mem = (a_low << 4) | high;
+            WriteHL(mem);
+            F &= ~(FLAG_H | FLAG_N);
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+            LogOpcode(opcode, true, "ED ");
+            return 18;
+        }
+        case 0x6F: { // RLD
+            uint8_t mem = ReadHL();
+            uint8_t low = mem & 0x0F;
+            uint8_t high = (mem >> 4) & 0x0F;
+            uint8_t a_low = A & 0x0F;
+            A = (A & 0xF0) | high;
+            mem = (low << 4) | a_low;
+            WriteHL(mem);
+            F &= ~(FLAG_H | FLAG_N);
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+            LogOpcode(opcode, true, "ED ");
+            return 18;
+        }
+        default:
+            unimplementedEDCount++;
+            LogOpcode(opcode, false, "ED ");
+            return 8;
+    }
+}
+
+// -------------------------------------------------------------
+// CB Indexed (IX/IY + d)
+// -------------------------------------------------------------
+uint32_t Z80::ExecuteCBIndexed(uint16_t index, int8_t d, uint8_t cbOpcode) {
+    uint16_t addr = index + d;
+    uint8_t value = readMemory ? readMemory(addr) : 0xFF;
+    int opType = 0; // 0=shift/rotate, 1=bit, 2=res/set
+
+    uint8_t op = cbOpcode >> 3;
+    switch (op) {
+        case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: { // RLC
+            uint8_t bit7 = value >> 7;
+            value = (value << 1) | bit7;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x08: case 0x09: case 0x0A: case 0x0B: case 0x0C: case 0x0D: case 0x0E: case 0x0F: { // RRC
+            uint8_t bit0 = value & 1;
+            value = (value >> 1) | (bit0 << 7);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: { // RL
+            uint8_t bit7 = value >> 7;
+            value = (value << 1) | ((F & FLAG_C) ? 1 : 0);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: { // RR
+            uint8_t bit0 = value & 1;
+            value = (value >> 1) | (((F & FLAG_C) ? 1 : 0) << 7);
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: { // SLA
+            uint8_t bit7 = value >> 7;
+            value <<= 1;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit7 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x28: case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: { // SRA
+            uint8_t bit0 = value & 1;
+            uint8_t bit7 = value & 0x80;
+            value = (value >> 1) | bit7;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        case 0x38: case 0x39: case 0x3A: case 0x3B: case 0x3C: case 0x3D: case 0x3E: case 0x3F: { // SRL
+            uint8_t bit0 = value & 1;
+            value >>= 1;
+            F &= ~(FLAG_N | FLAG_H);
+            F |= (bit0 ? FLAG_C : 0);
+            SetZeroFlag(value);
+            SetSignFlag(value);
+            SetParityFlag(value);
+            break;
+        }
+        default: {
+            if ((cbOpcode & 0xC0) == 0x40) { // BIT
+                opType = 1;
+                uint8_t bit = cbOpcode & 0x07;
+                bool bitSet = value & (1 << bit);
+                F = (F & ~(FLAG_Z | FLAG_H | FLAG_N)) | FLAG_H;
+                if (!bitSet) F |= FLAG_Z;
+            } else if ((cbOpcode & 0xC0) == 0x80) { // RES
+                opType = 2;
+                uint8_t bit = cbOpcode & 0x07;
+                value &= ~(1 << bit);
+            } else if ((cbOpcode & 0xC0) == 0xC0) { // SET
+                opType = 2;
+                uint8_t bit = cbOpcode & 0x07;
+                value |= (1 << bit);
+            } else {
+                LogOpcode(cbOpcode, false, "CB ");
+                return 8;
+            }
+            break;
+        }
+    }
+
+    // Write back if not BIT
+    if (opType != 1) {
+        if (writeMemory) writeMemory(addr, value);
+    }
+
+    uint32_t cycles;
+    if (opType == 0) cycles = 23; // for indexed shifts
+    else if (opType == 1) cycles = 20; // for BIT
+    else cycles = 23; // for RES/SET
+
+    LogOpcode(cbOpcode, true, "CB ");
+    return cycles;
 }
 
 // -------------------------------------------------------------
@@ -248,6 +1009,18 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
 uint32_t Z80::DoLoadRegToReg(uint8_t opcode) {
     uint8_t dest = (opcode >> 3) & 0x07;
     uint8_t src  = opcode & 0x07;
+
+    // dest==6 means (HL) on the left side
+    if (dest == 6) {
+        WriteHL(GetReg(src));
+        return 7;
+    }
+
+    if (src == 6) { // src==6 means (HL) on the right side
+        GetReg(dest) = ReadHL();
+        return 7;
+    }
+
     GetReg(dest) = GetReg(src);
     return 4;
 }
@@ -305,5 +1078,74 @@ void Z80::SetSignFlag(uint8_t v) {
 void Z80::SetHalfCarryFlag(uint8_t, uint8_t op1, uint8_t op2) {
     if (((op1 & 0xF) + (op2 & 0xF)) & 0x10) F |= FLAG_H;
     else F &= ~FLAG_H;
+}
+
+uint8_t& Z80::GetReg(uint8_t code) {
+    switch (code) {
+        case 0: return B;
+        case 1: return C;
+        case 2: return D;
+        case 3: return E;
+        case 4: return H;
+        case 5: return L;
+        case 7: return A;
+        default:
+            static uint8_t invalid = 0;
+            return invalid;
+    }
+}
+
+uint16_t Z80::HLAddress() const {
+    return (uint16_t)(H) << 8 | L;
+}
+
+uint16_t Z80::DEAddress() const {
+    return (uint16_t)(D) << 8 | E;
+}
+
+uint8_t Z80::ReadHL() {
+    return readMemory ? readMemory(HLAddress()) : 0xFF;
+}
+
+void Z80::WriteHL(uint8_t value) {
+    if (writeMemory) writeMemory(HLAddress(), value);
+}
+
+void Z80::WriteDE(uint8_t value) {
+    if (writeMemory) writeMemory(DEAddress(), value);
+}
+
+void Z80::SetParityFlag(uint8_t value) {
+    uint8_t bits = value;
+    bits ^= bits >> 4;
+    bits ^= bits >> 2;
+    bits ^= bits >> 1;
+    if ((bits & 1) == 0) F |= FLAG_P;
+    else F &= ~FLAG_P;
+}
+
+void Z80::LogOpcode(uint8_t opcode, bool implemented, const char* prefix) {
+    if (implemented) {
+        if (opcode == 0x00)
+            return;
+        if (!traceOpcodes)
+            return;
+        std::cout << (prefix ? prefix : "")
+                  << "Opcode OK: 0x" << std::hex << int(opcode) << std::dec << "\n";
+    } else {
+        if (!traceUnimplementedOpcodes)
+            return;
+        std::cerr << (prefix ? prefix : "")
+                  << "Unimplemented opcode: 0x" << std::hex << int(opcode) << std::dec << "\n";
+    }
+}
+
+void Z80::DumpOpcodeStats() const {
+    std::cout << std::dec;
+    std::cout << "Z80 opcode stats: executed=" << executedInstructionCount
+              << ", unimplemented=" << unimplementedInstructionCount
+              << ", unimplemented CB=" << unimplementedCBCount
+              << ", unimplemented ED=" << unimplementedEDCount
+              << "\n";
 }
 

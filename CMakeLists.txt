@@ -12,27 +12,36 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Include directories
-include_directories(src)
-
-# Collect source files
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS 
+# Collect core source files
+file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     "src/*.cpp"
-    "include/*.hpp"
+    "src/*.c"
 )
 
-# Create the executable
-add_executable(msx-emulator ${SOURCES})
+# Exclude the application entry-point from the library sources
+list(FILTER CORE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
 
-# If using a separate library structure later, you would use:
-# add_library(msx-core ...)
-# target_link_libraries(msx-emulator ...)
+# Core library target
+add_library(msx_emulator_core STATIC ${CORE_SOURCES})
 
-# Threads (often needed for audio/Video)
+target_include_directories(msx_emulator_core
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/include
+)
+
+target_compile_features(msx_emulator_core PUBLIC cxx_std_20)
+
+# Threads (often needed for audio/video)
 find_package(Threads REQUIRED)
-target_link_libraries(msx-emulator Threads::Threads)
 
-# fetch Catch2
+target_link_libraries(msx_emulator_core PUBLIC Threads::Threads)
+
+# Executable target
+add_executable(msx-emulator src/main.cpp)
+target_link_libraries(msx-emulator PRIVATE msx_emulator_core Threads::Threads)
+
+# Fetch GoogleTest for unit/integration tests
 include(FetchContent)
 
 FetchContent_Declare(
@@ -43,8 +52,8 @@ FetchContent_Declare(
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# Enable testin support
-include (CTest)
+# Enable testing support
+include(CTest)
 enable_testing()
 
 add_subdirectory(tests)

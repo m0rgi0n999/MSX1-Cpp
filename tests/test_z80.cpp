@@ -176,7 +176,7 @@ TEST(Z80, LD_HL_from_r) {
 
   struct TestCase {
     uint8_t opcode;
-    uint8_t* value;
+    uint8_t value;
   };
 
   TestCase tests[] = {

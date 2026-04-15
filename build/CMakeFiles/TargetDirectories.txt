@@ -1,3 +1,4 @@
+/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/msx_emulator_core.dir
 /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/msx-emulator.dir
 /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/Experimental.dir
 /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/Nightly.dir

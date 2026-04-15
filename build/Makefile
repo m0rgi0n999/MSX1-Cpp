@@ -128,6 +128,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named msx_emulator_core
+
+# Build rule for target.
+msx_emulator_core: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 msx_emulator_core
+.PHONY : msx_emulator_core
+
+# fast build rule for target.
+msx_emulator_core/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/build
+.PHONY : msx_emulator_core/fast
+
+#=============================================================================
 # Target rules for targets named msx-emulator
 
 # Build rule for target.
@@ -574,7 +587,7 @@ src/core/CPU/Z80.o: src/core/CPU/Z80.cpp.o
 
 # target to build an object file
 src/core/CPU/Z80.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/CPU/Z80.cpp.o
 .PHONY : src/core/CPU/Z80.cpp.o
 
 src/core/CPU/Z80.i: src/core/CPU/Z80.cpp.i
@@ -582,7 +595,7 @@ src/core/CPU/Z80.i: src/core/CPU/Z80.cpp.i
 
 # target to preprocess a source file
 src/core/CPU/Z80.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/CPU/Z80.cpp.i
 .PHONY : src/core/CPU/Z80.cpp.i
 
 src/core/CPU/Z80.s: src/core/CPU/Z80.cpp.s
@@ -590,7 +603,7 @@ src/core/CPU/Z80.s: src/core/CPU/Z80.cpp.s
 
 # target to generate assembly for a file
 src/core/CPU/Z80.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/CPU/Z80.cpp.s
 .PHONY : src/core/CPU/Z80.cpp.s
 
 src/core/Emulator.o: src/core/Emulator.cpp.o
@@ -598,7 +611,7 @@ src/core/Emulator.o: src/core/Emulator.cpp.o
 
 # target to build an object file
 src/core/Emulator.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.o
 .PHONY : src/core/Emulator.cpp.o
 
 src/core/Emulator.i: src/core/Emulator.cpp.i
@@ -606,7 +619,7 @@ src/core/Emulator.i: src/core/Emulator.cpp.i
 
 # target to preprocess a source file
 src/core/Emulator.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.i
 .PHONY : src/core/Emulator.cpp.i
 
 src/core/Emulator.s: src/core/Emulator.cpp.s
@@ -614,7 +627,7 @@ src/core/Emulator.s: src/core/Emulator.cpp.s
 
 # target to generate assembly for a file
 src/core/Emulator.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.s
 .PHONY : src/core/Emulator.cpp.s
 
 src/core/Memory/Bus.o: src/core/Memory/Bus.cpp.o
@@ -622,7 +635,7 @@ src/core/Memory/Bus.o: src/core/Memory/Bus.cpp.o
 
 # target to build an object file
 src/core/Memory/Bus.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.o
 .PHONY : src/core/Memory/Bus.cpp.o
 
 src/core/Memory/Bus.i: src/core/Memory/Bus.cpp.i
@@ -630,7 +643,7 @@ src/core/Memory/Bus.i: src/core/Memory/Bus.cpp.i
 
 # target to preprocess a source file
 src/core/Memory/Bus.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.i
 .PHONY : src/core/Memory/Bus.cpp.i
 
 src/core/Memory/Bus.s: src/core/Memory/Bus.cpp.s
@@ -638,7 +651,7 @@ src/core/Memory/Bus.s: src/core/Memory/Bus.cpp.s
 
 # target to generate assembly for a file
 src/core/Memory/Bus.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.s
 .PHONY : src/core/Memory/Bus.cpp.s
 
 src/core/Memory/MemoryMapper.o: src/core/Memory/MemoryMapper.cpp.o
@@ -646,7 +659,7 @@ src/core/Memory/MemoryMapper.o: src/core/Memory/MemoryMapper.cpp.o
 
 # target to build an object file
 src/core/Memory/MemoryMapper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/MemoryMapper.cpp.o
 .PHONY : src/core/Memory/MemoryMapper.cpp.o
 
 src/core/Memory/MemoryMapper.i: src/core/Memory/MemoryMapper.cpp.i
@@ -654,7 +667,7 @@ src/core/Memory/MemoryMapper.i: src/core/Memory/MemoryMapper.cpp.i
 
 # target to preprocess a source file
 src/core/Memory/MemoryMapper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/MemoryMapper.cpp.i
 .PHONY : src/core/Memory/MemoryMapper.cpp.i
 
 src/core/Memory/MemoryMapper.s: src/core/Memory/MemoryMapper.cpp.s
@@ -662,7 +675,7 @@ src/core/Memory/MemoryMapper.s: src/core/Memory/MemoryMapper.cpp.s
 
 # target to generate assembly for a file
 src/core/Memory/MemoryMapper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/Memory/MemoryMapper.cpp.s
 .PHONY : src/core/Memory/MemoryMapper.cpp.s
 
 src/core/PSG/AY8910.o: src/core/PSG/AY8910.cpp.o
@@ -670,7 +683,7 @@ src/core/PSG/AY8910.o: src/core/PSG/AY8910.cpp.o
 
 # target to build an object file
 src/core/PSG/AY8910.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/AY8910.cpp.o
 .PHONY : src/core/PSG/AY8910.cpp.o
 
 src/core/PSG/AY8910.i: src/core/PSG/AY8910.cpp.i
@@ -678,7 +691,7 @@ src/core/PSG/AY8910.i: src/core/PSG/AY8910.cpp.i
 
 # target to preprocess a source file
 src/core/PSG/AY8910.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/AY8910.cpp.i
 .PHONY : src/core/PSG/AY8910.cpp.i
 
 src/core/PSG/AY8910.s: src/core/PSG/AY8910.cpp.s
@@ -686,7 +699,7 @@ src/core/PSG/AY8910.s: src/core/PSG/AY8910.cpp.s
 
 # target to generate assembly for a file
 src/core/PSG/AY8910.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/AY8910.cpp.s
 .PHONY : src/core/PSG/AY8910.cpp.s
 
 src/core/PSG/PSG.o: src/core/PSG/PSG.cpp.o
@@ -694,7 +707,7 @@ src/core/PSG/PSG.o: src/core/PSG/PSG.cpp.o
 
 # target to build an object file
 src/core/PSG/PSG.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/PSG.cpp.o
 .PHONY : src/core/PSG/PSG.cpp.o
 
 src/core/PSG/PSG.i: src/core/PSG/PSG.cpp.i
@@ -702,7 +715,7 @@ src/core/PSG/PSG.i: src/core/PSG/PSG.cpp.i
 
 # target to preprocess a source file
 src/core/PSG/PSG.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/PSG.cpp.i
 .PHONY : src/core/PSG/PSG.cpp.i
 
 src/core/PSG/PSG.s: src/core/PSG/PSG.cpp.s
@@ -710,7 +723,7 @@ src/core/PSG/PSG.s: src/core/PSG/PSG.cpp.s
 
 # target to generate assembly for a file
 src/core/PSG/PSG.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/PSG/PSG.cpp.s
 .PHONY : src/core/PSG/PSG.cpp.s
 
 src/core/VDP/TMS9918.o: src/core/VDP/TMS9918.cpp.o
@@ -718,7 +731,7 @@ src/core/VDP/TMS9918.o: src/core/VDP/TMS9918.cpp.o
 
 # target to build an object file
 src/core/VDP/TMS9918.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/TMS9918.cpp.o
 .PHONY : src/core/VDP/TMS9918.cpp.o
 
 src/core/VDP/TMS9918.i: src/core/VDP/TMS9918.cpp.i
@@ -726,7 +739,7 @@ src/core/VDP/TMS9918.i: src/core/VDP/TMS9918.cpp.i
 
 # target to preprocess a source file
 src/core/VDP/TMS9918.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/TMS9918.cpp.i
 .PHONY : src/core/VDP/TMS9918.cpp.i
 
 src/core/VDP/TMS9918.s: src/core/VDP/TMS9918.cpp.s
@@ -734,7 +747,7 @@ src/core/VDP/TMS9918.s: src/core/VDP/TMS9918.cpp.s
 
 # target to generate assembly for a file
 src/core/VDP/TMS9918.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/TMS9918.cpp.s
 .PHONY : src/core/VDP/TMS9918.cpp.s
 
 src/core/VDP/VDP.o: src/core/VDP/VDP.cpp.o
@@ -742,7 +755,7 @@ src/core/VDP/VDP.o: src/core/VDP/VDP.cpp.o
 
 # target to build an object file
 src/core/VDP/VDP.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/VDP.cpp.o
 .PHONY : src/core/VDP/VDP.cpp.o
 
 src/core/VDP/VDP.i: src/core/VDP/VDP.cpp.i
@@ -750,7 +763,7 @@ src/core/VDP/VDP.i: src/core/VDP/VDP.cpp.i
 
 # target to preprocess a source file
 src/core/VDP/VDP.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/VDP.cpp.i
 .PHONY : src/core/VDP/VDP.cpp.i
 
 src/core/VDP/VDP.s: src/core/VDP/VDP.cpp.s
@@ -758,7 +771,7 @@ src/core/VDP/VDP.s: src/core/VDP/VDP.cpp.s
 
 # target to generate assembly for a file
 src/core/VDP/VDP.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/core/VDP/VDP.cpp.s
 .PHONY : src/core/VDP/VDP.cpp.s
 
 src/io/FileManager.o: src/io/FileManager.cpp.o
@@ -766,7 +779,7 @@ src/io/FileManager.o: src/io/FileManager.cpp.o
 
 # target to build an object file
 src/io/FileManager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/FileManager.cpp.o
 .PHONY : src/io/FileManager.cpp.o
 
 src/io/FileManager.i: src/io/FileManager.cpp.i
@@ -774,7 +787,7 @@ src/io/FileManager.i: src/io/FileManager.cpp.i
 
 # target to preprocess a source file
 src/io/FileManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/FileManager.cpp.i
 .PHONY : src/io/FileManager.cpp.i
 
 src/io/FileManager.s: src/io/FileManager.cpp.s
@@ -782,7 +795,7 @@ src/io/FileManager.s: src/io/FileManager.cpp.s
 
 # target to generate assembly for a file
 src/io/FileManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/FileManager.cpp.s
 .PHONY : src/io/FileManager.cpp.s
 
 src/io/InputManager.o: src/io/InputManager.cpp.o
@@ -790,7 +803,7 @@ src/io/InputManager.o: src/io/InputManager.cpp.o
 
 # target to build an object file
 src/io/InputManager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/InputManager.cpp.o
 .PHONY : src/io/InputManager.cpp.o
 
 src/io/InputManager.i: src/io/InputManager.cpp.i
@@ -798,7 +811,7 @@ src/io/InputManager.i: src/io/InputManager.cpp.i
 
 # target to preprocess a source file
 src/io/InputManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/InputManager.cpp.i
 .PHONY : src/io/InputManager.cpp.i
 
 src/io/InputManager.s: src/io/InputManager.cpp.s
@@ -806,7 +819,7 @@ src/io/InputManager.s: src/io/InputManager.cpp.s
 
 # target to generate assembly for a file
 src/io/InputManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/io/InputManager.cpp.s
 .PHONY : src/io/InputManager.cpp.s
 
 src/main.o: src/main.cpp.o
@@ -838,7 +851,7 @@ src/utils/Logger.o: src/utils/Logger.cpp.o
 
 # target to build an object file
 src/utils/Logger.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.o
 .PHONY : src/utils/Logger.cpp.o
 
 src/utils/Logger.i: src/utils/Logger.cpp.i
@@ -846,7 +859,7 @@ src/utils/Logger.i: src/utils/Logger.cpp.i
 
 # target to preprocess a source file
 src/utils/Logger.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.i
 .PHONY : src/utils/Logger.cpp.i
 
 src/utils/Logger.s: src/utils/Logger.cpp.s
@@ -854,7 +867,7 @@ src/utils/Logger.s: src/utils/Logger.cpp.s
 
 # target to generate assembly for a file
 src/utils/Logger.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx-emulator.dir/build.make CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/msx_emulator_core.dir/build.make CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.s
 .PHONY : src/utils/Logger.cpp.s
 
 # Help Target
@@ -899,6 +912,7 @@ help:
 	@echo "... gtest"
 	@echo "... gtest_main"
 	@echo "... msx-emulator"
+	@echo "... msx_emulator_core"
 	@echo "... test_z80"
 	@echo "... src/core/CPU/Z80.o"
 	@echo "... src/core/CPU/Z80.i"

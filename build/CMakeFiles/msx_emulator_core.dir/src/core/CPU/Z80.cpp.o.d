@@ -1,4 +1,4 @@
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o: \
+CMakeFiles/msx_emulator_core.dir/src/core/CPU/Z80.cpp.o: \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp \
  /usr/include/stdc-predef.h \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.hpp \

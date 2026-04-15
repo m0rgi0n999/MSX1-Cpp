@@ -4,13 +4,12 @@
 int main() {
     Emulator emulator;
 
-    // Attempt to load a dummy BIOS (or real one if have it)
-    // Create a dummy file first for testing
-    // Or just initialize and reset.
-
-    emulator.LoadSystemROM("assets/roms/zexall.com");
+    // Use an absolute path for the BIOS ROM so the executable works
+    // consistently regardless of the current working directory.
+    emulator.LoadSystemROM("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/zexall.com");
 
     std::cout << "Attempting to run a frame..." << std::endl;
+    emulator.EnableOpcodeTrace(true);
     emulator.RunFrame();
 
     std::cout << "Frame execution finished." << std::endl;

@@ -72,150 +72,10 @@ include CMakeFiles/msx-emulator.dir/flags.make
 CMakeFiles/msx-emulator.dir/codegen:
 .PHONY : CMakeFiles/msx-emulator.dir/codegen
 
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp > CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp -o CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.cpp
-CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.cpp > CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.cpp -o CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp
-CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp > CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp -o CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp
-CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp > CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp -o CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp
-CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp > CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp -o CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/PSG.cpp
-CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/PSG.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/PSG.cpp > CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/PSG.cpp -o CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp
-CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp > CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp -o CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/VDP.cpp
-CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o -MF CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/VDP.cpp
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/VDP.cpp > CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/VDP.cpp -o CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.cpp
-CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o -MF CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.cpp
-
-CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.cpp > CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.cpp -o CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.s
-
-CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/InputManager.cpp
-CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o -MF CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/InputManager.cpp
-
-CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/InputManager.cpp > CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/InputManager.cpp -o CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.s
-
 CMakeFiles/msx-emulator.dir/src/main.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
 CMakeFiles/msx-emulator.dir/src/main.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/main.cpp
 CMakeFiles/msx-emulator.dir/src/main.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/msx-emulator.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/msx-emulator.dir/src/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/main.cpp.o -MF CMakeFiles/msx-emulator.dir/src/main.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/main.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/main.cpp
 
 CMakeFiles/msx-emulator.dir/src/main.cpp.i: cmake_force
@@ -226,54 +86,19 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/main.cpp -o CMakeFiles/msx-emulator.dir/src/main.cpp.s
 
-CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o: CMakeFiles/msx-emulator.dir/flags.make
-CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp
-CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o: CMakeFiles/msx-emulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o -MF CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o.d -o CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o -c /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp
-
-CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp > CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.i
-
-CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp -o CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.s
-
 # Object files for target msx-emulator
 msx__emulator_OBJECTS = \
-"CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/main.cpp.o" \
-"CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o"
+"CMakeFiles/msx-emulator.dir/src/main.cpp.o"
 
 # External object files for target msx-emulator
 msx__emulator_EXTERNAL_OBJECTS =
 
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/CPU/Z80.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/Emulator.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/Memory/Bus.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/Memory/MemoryMapper.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/PSG/AY8910.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/PSG/PSG.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/VDP/TMS9918.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/core/VDP/VDP.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/io/FileManager.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/io/InputManager.cpp.o
 msx-emulator: CMakeFiles/msx-emulator.dir/src/main.cpp.o
-msx-emulator: CMakeFiles/msx-emulator.dir/src/utils/Logger.cpp.o
 msx-emulator: CMakeFiles/msx-emulator.dir/build.make
 msx-emulator: CMakeFiles/msx-emulator.dir/compiler_depend.ts
+msx-emulator: libmsx_emulator_core.a
 msx-emulator: CMakeFiles/msx-emulator.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable msx-emulator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable msx-emulator"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/msx-emulator.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
