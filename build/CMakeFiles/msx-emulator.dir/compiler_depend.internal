@@ -6,6 +6,7 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.o
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.hpp
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.hpp
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.hpp
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.hpp
  /usr/include/alloca.h
@@ -92,6 +93,7 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.o
  /usr/include/c++/15/bits/basic_string.tcc
  /usr/include/c++/15/bits/char_traits.h
  /usr/include/c++/15/bits/charconv.h
+ /usr/include/c++/15/bits/codecvt.h
  /usr/include/c++/15/bits/concept_check.h
  /usr/include/c++/15/bits/cpp_type_traits.h
  /usr/include/c++/15/bits/cxxabi_forced.h
@@ -101,6 +103,7 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.o
  /usr/include/c++/15/bits/exception.h
  /usr/include/c++/15/bits/exception_defines.h
  /usr/include/c++/15/bits/exception_ptr.h
+ /usr/include/c++/15/bits/fstream.tcc
  /usr/include/c++/15/bits/functexcept.h
  /usr/include/c++/15/bits/functional_hash.h
  /usr/include/c++/15/bits/hash_bytes.h
@@ -176,6 +179,7 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.o
  /usr/include/c++/15/ext/numeric_traits.h
  /usr/include/c++/15/ext/string_conversions.h
  /usr/include/c++/15/ext/type_traits.h
+ /usr/include/c++/15/fstream
  /usr/include/c++/15/functional
  /usr/include/c++/15/initializer_list
  /usr/include/c++/15/ios
@@ -197,8 +201,10 @@ CMakeFiles/msx-emulator.dir/src/main.cpp.o
  /usr/include/c++/15/unordered_map
  /usr/include/c++/15/vector
  /usr/include/c++/15/x86_64-redhat-linux/bits/atomic_word.h
+ /usr/include/c++/15/x86_64-redhat-linux/bits/basic_file.h
  /usr/include/c++/15/x86_64-redhat-linux/bits/c++allocator.h
  /usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h
+ /usr/include/c++/15/x86_64-redhat-linux/bits/c++io.h
  /usr/include/c++/15/x86_64-redhat-linux/bits/c++locale.h
  /usr/include/c++/15/x86_64-redhat-linux/bits/cpu_defines.h
  /usr/include/c++/15/x86_64-redhat-linux/bits/ctype_base.h

@@ -1,19 +1,41 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include "core/Emulator.hpp"
 
-int main() {
-    Emulator emulator;
+// Helper function to load binary files
+std::vector<uint8_t> LoadFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
 
-    // Use an absolute path for the BIOS ROM so the executable works
-    // consistently regardless of the current working directory.
-    emulator.LoadSystemROM("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/zexall.com");
-
-    std::cout << "Attempting to run a frame..." << std::endl;
-    emulator.EnableOpcodeTrace(true);
-    emulator.RunFrame();
-
-    std::cout << "Frame execution finished." << std::endl;
-    emulator.GetVDP().DumpVRAM(0x2000, 16); // Dump first 16 bytes
-    return 0;
+    std::vector<uint8_t> buffer(size);
+    if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+        return buffer;
+    }
+    return {};
 }
 
+int main() {
+    try {
+        Emulator emulator;
+        
+        // 1. Load the BIOS
+        auto bios = LoadFile("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/cbios_main_msx1.rom");
+        
+        // 2. Initialize (this maps the BIOS and resets the Z80)
+        emulator.Initialize(bios);
+
+        // 3. Run the frame (Added parentheses here)
+        emulator.RunFrame();
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}

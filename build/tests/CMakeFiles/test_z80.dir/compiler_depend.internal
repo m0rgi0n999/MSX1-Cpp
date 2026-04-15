@@ -25,6 +25,8 @@ tests/CMakeFiles/test_z80.dir/test_z80.cpp.o
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/internal/gtest-string.h
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/internal/gtest-type-util.h
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.hpp
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp
  /usr/include/alloca.h
  /usr/include/asm-generic/bitsperlong.h
  /usr/include/asm-generic/errno-base.h

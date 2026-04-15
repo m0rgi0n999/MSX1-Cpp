@@ -10,9 +10,14 @@ public:
     // Execute cycles (VDP runs in parallel with CPU)
     void Update(uint32_t cpuCycles);
 
-    // Port interfaces for the MSX Bus
-    uint8_t Read(uint8_t port); // Read Status (Port 1)
-    void Write(uint8_t port, uint8_t data); // Write Data (Port 0) or Reg (Port 1)
+    // --- Port interfaces for the MSX Bus ---
+    // Port 0x98: Data Port
+    uint8_t ReadData();
+    void WriteData(uint8_t data);
+
+    // Port 0x99: Control/Status Port
+    uint8_t ReadStatus();
+    void WriteControl(uint8_t data);
 
     // Get the current frame buffer (for the display renderer)
     const std::vector<uint8_t>& GetFrameBuffer() const;
@@ -20,18 +25,18 @@ public:
     void DumpVRAM(uint16_t start, uint16_t length) const;
 
 private:
-    // Internal State
-    std::vector<uint8_t> vram; // 16KB VRAM
-    std::vector<uint8_t> framebuffer; // 256x212 (approx) pixel buffer
+    // Internal Memory
+    std::vector<uint8_t> vram;         // 16KB VRAM
+    std::vector<uint8_t> framebuffer;  // Pixel buffer for rendering
 
+    // Internal State Registers
     uint8_t registers[8];
     uint8_t statusReg;
-    uint8_t firstByteLatch; // For handling 2-byte write sequences
 
-    // Helper to convert VRAM to pixel data (skeletal implementation placeholder)
+    // --- Communication Logic ---
+    uint16_t currentAddress = 0;   // The internal VRAM pointer
+    uint8_t addressBuffer = 0;     // Stores the first byte of a 2-byte sequence
+    bool addressLatch = false;     // False = waiting for 1st byte, True = waiting for 2nd
+
     void RefreshScreen(); 
-
-    uint16_t vramAddress; // ADD THIS: Tracks where we are writing VRAM data
-    bool latchActive;
 };
-

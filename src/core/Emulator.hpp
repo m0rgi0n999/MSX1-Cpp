@@ -13,12 +13,6 @@ public:
     // Initialize the system (Load BIOS)
     void LoadSystemROM(const std::string& biosPath);
 
-    // Load a cartridge, tape, or disk
-    void InsertCartridge(const std::string& romPath);
-
-    // Execute one frame of emulation (until VSync)
-    void RunFrame();
-
     // Debugging helpers
     void EnableOpcodeTrace(bool enabled);
 
@@ -26,6 +20,19 @@ public:
     // TMS9918* GetVDP() { return &vdp; }
     const TMS9918& GetVDP() const { return vdp; }
     AY8910* GetPSG() { return &psg; }
+
+    void InsertCartridge(const std::vector<uint8_t>& romData) {
+        bus.InsertDevice(1, 0x0000, 0x3FFF, romData, true); // Slot 1, Page 0
+    }
+
+    // Add these public "Hardware Probes"
+    void Out(uint8_t port, uint8_t value) { bus.IO_Write(port, value); }
+    uint8_t In(uint8_t port) { return bus.IO_Read(port); }
+
+    void Initialize(const std::vector<uint8_t>& bios);
+
+    // Your main loop methods...
+    void RunFrame();
 
 private:
     Z80 z80;

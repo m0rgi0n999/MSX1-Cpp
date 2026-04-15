@@ -236,6 +236,7 @@ CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.o: /home/erwin/source/sou
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.hpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.hpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
+  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.hpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.hpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.hpp \
@@ -512,6 +513,7 @@ CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.o: /home/erwin/source/sou
 
 CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
+  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
   /usr/include/alloca.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
@@ -752,7 +754,89 @@ CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.o: /home/erwin/source/s
   /usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h
 
 CMakeFiles/msx_emulator_core.dir/src/core/Memory/MemoryMapper.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp \
-  /usr/include/stdc-predef.h
+  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
+  /usr/include/bits/libc-header-start.h \
+  /usr/include/bits/long-double.h \
+  /usr/include/bits/stdint-intn.h \
+  /usr/include/bits/stdint-least.h \
+  /usr/include/bits/stdint-uintn.h \
+  /usr/include/bits/time64.h \
+  /usr/include/bits/timesize.h \
+  /usr/include/bits/types.h \
+  /usr/include/bits/typesizes.h \
+  /usr/include/bits/wchar.h \
+  /usr/include/bits/wordsize.h \
+  /usr/include/c++/15/array \
+  /usr/include/c++/15/backward/binders.h \
+  /usr/include/c++/15/bit \
+  /usr/include/c++/15/bits/alloc_traits.h \
+  /usr/include/c++/15/bits/allocator.h \
+  /usr/include/c++/15/bits/concept_check.h \
+  /usr/include/c++/15/bits/cpp_type_traits.h \
+  /usr/include/c++/15/bits/exception.h \
+  /usr/include/c++/15/bits/exception_defines.h \
+  /usr/include/c++/15/bits/functexcept.h \
+  /usr/include/c++/15/bits/functional_hash.h \
+  /usr/include/c++/15/bits/hash_bytes.h \
+  /usr/include/c++/15/bits/invoke.h \
+  /usr/include/c++/15/bits/iterator_concepts.h \
+  /usr/include/c++/15/bits/max_size_type.h \
+  /usr/include/c++/15/bits/memory_resource.h \
+  /usr/include/c++/15/bits/memoryfwd.h \
+  /usr/include/c++/15/bits/move.h \
+  /usr/include/c++/15/bits/new_allocator.h \
+  /usr/include/c++/15/bits/predefined_ops.h \
+  /usr/include/c++/15/bits/ptr_traits.h \
+  /usr/include/c++/15/bits/range_access.h \
+  /usr/include/c++/15/bits/ranges_base.h \
+  /usr/include/c++/15/bits/ranges_cmp.h \
+  /usr/include/c++/15/bits/ranges_util.h \
+  /usr/include/c++/15/bits/refwrap.h \
+  /usr/include/c++/15/bits/requires_hosted.h \
+  /usr/include/c++/15/bits/stl_algobase.h \
+  /usr/include/c++/15/bits/stl_bvector.h \
+  /usr/include/c++/15/bits/stl_construct.h \
+  /usr/include/c++/15/bits/stl_function.h \
+  /usr/include/c++/15/bits/stl_iterator.h \
+  /usr/include/c++/15/bits/stl_iterator_base_funcs.h \
+  /usr/include/c++/15/bits/stl_iterator_base_types.h \
+  /usr/include/c++/15/bits/stl_pair.h \
+  /usr/include/c++/15/bits/stl_uninitialized.h \
+  /usr/include/c++/15/bits/stl_vector.h \
+  /usr/include/c++/15/bits/uses_allocator.h \
+  /usr/include/c++/15/bits/uses_allocator_args.h \
+  /usr/include/c++/15/bits/utility.h \
+  /usr/include/c++/15/bits/vector.tcc \
+  /usr/include/c++/15/bits/version.h \
+  /usr/include/c++/15/compare \
+  /usr/include/c++/15/concepts \
+  /usr/include/c++/15/cstddef \
+  /usr/include/c++/15/cstdint \
+  /usr/include/c++/15/debug/assertions.h \
+  /usr/include/c++/15/debug/debug.h \
+  /usr/include/c++/15/ext/alloc_traits.h \
+  /usr/include/c++/15/ext/numeric_traits.h \
+  /usr/include/c++/15/ext/type_traits.h \
+  /usr/include/c++/15/initializer_list \
+  /usr/include/c++/15/new \
+  /usr/include/c++/15/numbers \
+  /usr/include/c++/15/pstl/pstl_config.h \
+  /usr/include/c++/15/tuple \
+  /usr/include/c++/15/type_traits \
+  /usr/include/c++/15/vector \
+  /usr/include/c++/15/x86_64-redhat-linux/bits/c++allocator.h \
+  /usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h \
+  /usr/include/c++/15/x86_64-redhat-linux/bits/cpu_defines.h \
+  /usr/include/c++/15/x86_64-redhat-linux/bits/os_defines.h \
+  /usr/include/features-time64.h \
+  /usr/include/features.h \
+  /usr/include/gnu/stubs-64.h \
+  /usr/include/gnu/stubs.h \
+  /usr/include/stdc-predef.h \
+  /usr/include/stdint.h \
+  /usr/include/sys/cdefs.h \
+  /usr/lib/gcc/x86_64-redhat-linux/15/include/stddef.h \
+  /usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h
 
 CMakeFiles/msx_emulator_core.dir/src/core/PSG/AY8910.cpp.o: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.hpp \
@@ -1434,6 +1518,8 @@ CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.o: /home/erwin/source/sour
 
 /usr/include/bits/types/locale_t.h:
 
+/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp:
+
 /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.hpp:
 
 /usr/include/c++/15/bits/fstream.tcc:
@@ -1714,6 +1800,12 @@ CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.o: /home/erwin/source/sour
 
 /usr/include/c++/15/vector:
 
+/usr/include/c++/15/bits/ranges_algobase.h:
+
+/usr/include/c++/15/bits/ptr_traits.h:
+
+/usr/include/c++/15/bits/stl_construct.h:
+
 /usr/include/c++/15/bits/stl_function.h:
 
 /usr/include/c++/15/cwchar:
@@ -1925,12 +2017,6 @@ CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.o: /home/erwin/source/sour
 /usr/include/bits/unistd_ext.h:
 
 /usr/include/bits/xopen_lim.h:
-
-/usr/include/c++/15/bits/ptr_traits.h:
-
-/usr/include/c++/15/bits/stl_construct.h:
-
-/usr/include/c++/15/bits/ranges_algobase.h:
 
 /usr/include/c++/15/bits/stl_heap.h:
 

@@ -73,6 +73,7 @@ CMakeFiles/msx_emulator_core.dir/src/core/Emulator.cpp.o: \
  /usr/include/c++/15/bits/stl_bvector.h \
  /usr/include/c++/15/bits/vector.tcc /usr/include/c++/15/array \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.hpp \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.hpp \
  /usr/include/c++/15/string /usr/include/c++/15/bits/stringfwd.h \

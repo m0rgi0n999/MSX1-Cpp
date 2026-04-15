@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include "MemoryMapper.hpp"
 
 class Bus {
 public:
@@ -20,7 +21,6 @@ public:
 
     // Memory Access
     uint8_t Read(uint16_t address);
-    void Write(uint16_t address, uint8_t data);
 
     // I/O Access
     uint8_t IO_Read(uint8_t port);
@@ -31,7 +31,14 @@ public:
     void MapIO(uint8_t port, ReadIOFunc r, WriteIOFunc w);
 
     // Utils
-    void LoadToRAM(uint16_t startAddress, const std::vector<uint8_t>& data);
+    void LoadToRAM(uint16_t address, const std::vector<uint8_t>& data);
+
+    void Write(uint16_t address, uint8_t value);
+
+    // Add a proxy method so the outside world can configure slots
+    void InsertDevice(int slot, uint16_t start, uint16_t end, const std::vector<uint8_t>& data, bool readOnly) {
+        mapper.InsertDevice(slot, start, end, data, readOnly);
+    }
 
 private:
     // Internal Struct for IO Mapping
@@ -49,7 +56,8 @@ private:
         WriteMemFunc write;
     };
 
-    std::vector<uint8_t> ram;
+    std::vector<uint8_t> biosBuffer; // Temporary storage for BIOS data
+    MemoryMapper mapper;
     std::vector<IOMapping> ioMap;
     std::vector<MemoryMapping> memoryMap;
 };

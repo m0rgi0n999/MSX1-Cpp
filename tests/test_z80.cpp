@@ -1,5 +1,7 @@
 #include "core/CPU/Z80.hpp"
 #include <gtest/gtest.h>   // or <catch2/catch_test_macros.hpp>
+#include "core/Memory/Bus.hpp"          // Add this
+#include "core/Memory/MemoryMapper.hpp"  // Add this
 
 // Shared test memory buffer + callbacks
 static uint8_t memory[65536];
@@ -10,14 +12,6 @@ static void    TestWriteMemory(uint16_t addr, uint8_t v) { memory[addr] = v; }
 // I/O tests, future proofing.
 static uint8_t lastPortWritten = 0;
 static uint8_t lasPortValue    = 0;
-
-static void TestgWriteIO(uint8_t port, uint8_t value) {
-  lastPortWritten = port;
-  lasPortValue = value;
-}
-static uint8_t TestReadIO(uint8_t port) {
-  return 0x42; // example dummy value
-}
 
 // --- SECTION 1: INC r ---
 TEST(Z80, INC_Registers) {
@@ -271,4 +265,66 @@ TEST(Z80, JP_C_taken)   {
   cpu.ExecuteInstruction();
 
   EXPECT_EQ(cpu.PC, 0x2000);
+}
+
+TEST(MemoryMapperTest, SlotSwitching) {
+    MemoryMapper mapper;
+
+    // Slot 0: BIOS (Read Only)
+    std::vector<uint8_t> bios(0x4000, 0xF1); 
+    mapper.InsertDevice(0, 0x0000, 0x3FFF, bios, true);
+
+    // Slot 1: RAM (Writable)
+    std::vector<uint8_t> ram(0x4000, 0x00);
+    mapper.InsertDevice(1, 0x0000, 0x3FFF, ram, false);
+
+    // Set Port 0xA8 to Slot 0 for Page 0 (bits 0-1 = 00)
+    mapper.WritePortA8(0x00);
+    EXPECT_EQ(mapper.Read(0x0000), 0xF1);
+
+    // Set Port 0xA8 to Slot 1 for Page 0 (bits 0-1 = 01)
+    mapper.WritePortA8(0x01);
+    mapper.Write(0x0000, 0x42);
+    EXPECT_EQ(mapper.Read(0x0000), 0x42);
+
+    // Switch back to Slot 0 (BIOS) - should still be 0xF1
+    mapper.WritePortA8(0x00);
+    EXPECT_EQ(mapper.Read(0x0000), 0xF1);
+}
+
+TEST(BusTest, LoadAndReadBack) {
+    Bus bus;
+    
+    // 1. Setup a dummy RAM block in Slot 0 for the whole 64KB range
+    std::vector<uint8_t> dummyRam(0x10000, 0);
+    
+    // Use the new proxy method instead of the bus.mapper.InsertDvice
+    bus.InsertDevice(0, 0x0000, 0xFFFF, dummyRam, false);
+
+    // To set A8, use your existing IO_Write
+    bus.IO_Write(0xA8, 0x00); // Point all pages to Slot 0
+    
+    // 2. Load some data
+    std::vector<uint8_t> testData = {0x01, 0x02, 0x03, 0x04};
+    bus.LoadToRAM(0xC000, testData);
+    
+    // 3. Verify
+    EXPECT_EQ(bus.Read(0xC000), 0x01);
+    EXPECT_EQ(bus.Read(0xC003), 0x04);
+}
+
+TEST(MSX_Integration, BootSlotState) {
+    Bus bus;
+    
+    // 1. Use the new bridge method instead of bus.mapper
+    std::vector<uint8_t> bios(0x4000, 0xF3);
+    bus.InsertDevice(0, 0x0000, 0x3FFF, bios, true);
+    
+    std::vector<uint8_t> ram(0x4000, 0x00);
+    bus.InsertDevice(3, 0xC000, 0xFFFF, ram, false);
+
+    // 2. Use IO_Write to change slots (this tests the Mapper through the Port 0xA8 logic)
+    bus.IO_Write(0xA8, 0x00); // Select Slot 0 for all pages
+    
+    EXPECT_EQ(bus.Read(0x0000), 0xF3);
 }

@@ -24,6 +24,8 @@ tests/CMakeFiles/test_z80.dir/test_z80.cpp.o: /home/erwin/source/source/8-bit/Z8
   _deps/googletest-src/googletest/include/gtest/internal/gtest-string.h \
   _deps/googletest-src/googletest/include/gtest/internal/gtest-type-util.h \
   /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.hpp \
+  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
+  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
   /usr/include/alloca.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
@@ -573,6 +575,10 @@ tests/CMakeFiles/test_z80.dir/test_z80.cpp.o:
 
 /usr/include/c++/15/concepts:
 
+/usr/include/c++/15/clocale:
+
+/usr/include/c++/15/climits:
+
 /usr/include/bits/types/struct_statx_timestamp.h:
 
 /usr/include/c++/15/memory:
@@ -586,6 +592,8 @@ tests/CMakeFiles/test_z80.dir/test_z80.cpp.o:
 /usr/include/bits/types/sigset_t.h:
 
 /usr/include/bits/types/locale_t.h:
+
+/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp:
 
 /usr/include/bits/types/__locale_t.h:
 
@@ -707,6 +715,10 @@ _deps/googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h:
 
 /usr/include/bits/pthreadtypes.h:
 
+/usr/include/bits/pthreadtypes-arch.h:
+
+/usr/include/bits/pthread_stack_min-dynamic.h:
+
 /usr/include/asm-generic/errno.h:
 
 /usr/include/asm/unistd.h:
@@ -728,8 +740,6 @@ _deps/googletest-src/googletest/include/gtest/internal/gtest-death-test-internal
 /usr/include/assert.h:
 
 /usr/include/bits/stat.h:
-
-/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/tests/test_z80.cpp:
 
 /usr/include/c++/15/variant:
 
@@ -757,8 +767,6 @@ _deps/googletest-src/googletest/include/gtest/gtest-death-test.h:
 
 /usr/include/c++/15/bits/locale_facets_nonio.tcc:
 
-/usr/include/bits/pthreadtypes-arch.h:
-
 _deps/googletest-src/googletest/include/gtest/gtest-typed-test.h:
 
 /usr/include/c++/15/pstl/pstl_config.h:
@@ -779,8 +787,6 @@ _deps/googletest-src/googletest/include/gtest/internal/gtest-internal.h:
 
 /usr/include/c++/15/bits/iterator_concepts.h:
 
-/usr/include/bits/types/__sigset_t.h:
-
 /usr/include/bits/typesizes.h:
 
 _deps/googletest-src/googletest/include/gtest/gtest-message.h:
@@ -797,8 +803,6 @@ _deps/googletest-src/googletest/include/gtest/gtest-test-part.h:
 
 /usr/include/bits/siginfo-consts.h:
 
-/usr/include/c++/15/climits:
-
 /usr/include/bits/libc-header-start.h:
 
 /usr/include/c++/15/bits/move.h:
@@ -810,6 +814,14 @@ _deps/googletest-src/googletest/include/gtest/gtest-test-part.h:
 _deps/googletest-src/googletest/include/gtest/internal/gtest-port.h:
 
 /usr/include/bits/select.h:
+
+/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/tests/test_z80.cpp:
+
+/usr/include/libintl.h:
+
+/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp:
+
+/usr/include/bits/endianness.h:
 
 /usr/include/bits/sigthread.h:
 
@@ -835,15 +847,17 @@ _deps/googletest-src/googletest/include/gtest/gtest-param-test.h:
 
 _deps/googletest-src/googletest/include/gtest/gtest_pred_impl.h:
 
-/usr/include/bits/statx.h:
-
-/usr/include/c++/15/bits/uses_allocator_args.h:
-
 /usr/include/bits/ss_flags.h:
 
 /usr/include/c++/15/bits/node_handle.h:
 
 _deps/googletest-src/googletest/include/gtest/internal/custom/gtest-port.h:
+
+/usr/include/bits/statx.h:
+
+/usr/include/c++/15/bits/uses_allocator_args.h:
+
+/usr/include/bits/types/__sigset_t.h:
 
 /usr/include/asm/bitsperlong.h:
 
@@ -911,10 +925,6 @@ _deps/googletest-src/googletest/include/gtest/internal/custom/gtest-port.h:
 
 /usr/include/c++/15/backward/binders.h:
 
-/usr/include/libintl.h:
-
-/usr/include/bits/endianness.h:
-
 /usr/include/c++/15/ext/concurrence.h:
 
 /usr/include/c++/15/bits/exception_ptr.h:
@@ -934,8 +944,6 @@ _deps/googletest-src/googletest/include/gtest/internal/custom/gtest-port.h:
 /usr/include/bits/posix1_lim.h:
 
 /usr/include/c++/15/cerrno:
-
-/usr/include/bits/pthread_stack_min-dynamic.h:
 
 /usr/include/bits/uio_lim.h:
 
@@ -1132,8 +1140,6 @@ _deps/googletest-src/googletest/include/gtest/gtest-assertion-result.h:
 /usr/include/c++/15/bits/stl_relops.h:
 
 /usr/include/c++/15/bits/stl_algobase.h:
-
-/usr/include/c++/15/clocale:
 
 /usr/include/bits/types/sigval_t.h:
 

@@ -26,18 +26,24 @@ Emulator::Emulator()
 
     // MAP IO DEVICES
 
-    // VDP DATA (0x98)
-    bus.MapIO(
-        0x98,
-        [this](uint8_t port) { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
+    // Port 0x98: VDP Data Port
+    bus.MapIO(0x98, 
+        [this](uint8_t) { 
+            return vdp.ReadData(); 
+        }, 
+        [this](uint8_t portVal, uint8_t dataVal) { 
+            vdp.WriteData(dataVal); 
+        }
     );
 
-    // VDP CTRL (0x99)
-    bus.MapIO(
-        0x99,
-        [this](uint8_t port) { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
+    // Port 0x99: VDP Control/Status Port
+    bus.MapIO(0x99, 
+        [this](uint8_t) { 
+            return vdp.ReadStatus(); 
+        }, 
+        [this](uint8_t portVal, uint8_t dataVal) { 
+            vdp.WriteControl(dataVal); 
+        }
     );
 
     // PSG ADDR (0xA0)
@@ -86,3 +92,12 @@ void Emulator::RunFrame() {
     vdp.DumpVRAM(0x2000, 16);
 }
 
+void Emulator::Initialize(const std::vector<uint8_t>& bios) {
+    // 1. Load the BIOS bytes into memory
+    bus.LoadToRAM(0x0000, bios);
+    
+    // 2. Ensure the CPU starts at the beginning
+    z80.Reset(); 
+    
+    std::cout << "System initialized: BIOS loaded to 0x0000" << std::endl;
+}

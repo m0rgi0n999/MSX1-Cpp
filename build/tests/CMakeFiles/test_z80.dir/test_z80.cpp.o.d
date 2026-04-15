@@ -253,4 +253,7 @@ tests/CMakeFiles/test_z80.dir/test_z80.cpp.o: \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/gtest-test-part.h \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/gtest-typed-test.h \
  /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/gtest_pred_impl.h \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/gtest_prod.h
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-src/googletest/include/gtest/gtest_prod.h \
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
+ /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp
