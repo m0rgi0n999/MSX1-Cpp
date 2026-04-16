@@ -22,20 +22,20 @@ std::vector<uint8_t> LoadFile(const std::string& filename) {
 int main() {
     try {
         Emulator emulator;
-        
-        // 1. Load the BIOS
-        auto bios = LoadFile("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/cbios_main_msx1.rom");
-        
-        // 2. Initialize (this maps the BIOS and resets the Z80)
+        auto bios = LoadFile("assets/roms/cbios_main_msx1.rom");
         emulator.Initialize(bios);
+        emulator.EnableOpcodeTrace(true);
 
-        // 3. Run the frame (Added parentheses here)
-        emulator.RunFrame();
+        // Turn this into a loop!
+        while (true) {
+            emulator.RunFrame();
+            
+            // In a real emulator, you'd sync this to 60FPS here
+        }
 
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-
     return 0;
 }

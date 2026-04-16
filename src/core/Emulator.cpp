@@ -73,23 +73,21 @@ void Emulator::LoadSystemROM(const std::string& biosPath) {
     }
     bus.LoadToRAM(0x0000, rom);
 }
-
 void Emulator::RunFrame() {
-    // Simple instruction batch execution for one frame.
-    uint32_t totalCycles = 0;
-    for (int i = 0; i < 1000; ++i) {
-        uint32_t cycles = z80.ExecuteInstruction();
-        totalCycles += cycles;
+    const uint32_t CYCLES_PER_FRAME = 59659; // Approx cycles for 60Hz MSX
+    uint32_t cyclesThisFrame = 0;
+
+    while (cyclesThisFrame < CYCLES_PER_FRAME) {
+        cyclesThisFrame += z80.ExecuteInstruction();
     }
 
-    // Update peripherals
-    vdp.Update(totalCycles);
-    psg.Tick(totalCycles);
+    // 1. Tell the VDP that time has passed so it sets its internal "V-Blank" flag
+    vdp.Update(cyclesThisFrame); 
 
-    z80.DumpOpcodeStats();
-
-    // Dump VRAM for debugging
-    vdp.DumpVRAM(0x2000, 16);
+    // 2. Trigger the CPU interrupt
+    // Now when the BIOS jumps to 0x0038, it will read VDP Port 0x99, 
+    // see the flag, and run the keyboard/timer logic!
+    z80.HandleInterrupt();
 }
 
 void Emulator::Initialize(const std::vector<uint8_t>& bios) {

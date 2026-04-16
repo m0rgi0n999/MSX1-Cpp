@@ -24,6 +24,7 @@ void Z80::Reset() {
     IX = IY = 0;
     PC = 0x0000;
     SP = 0xFFFF;
+    IFF1 = IFF2 = false;
 
     executedInstructionCount = 0;
     unimplementedInstructionCount = 0;
@@ -291,6 +292,11 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
             return ok(10);
         }
 
+        case 0xF3: { // DI
+            IFF1 = IFF2 = false;
+            return 4;
+        }
+
         case 0x09: // ADD HL/IX/IY,BC
         case 0x19: // ADD HL/IX/IY,DE
         case 0x29: // ADD HL/IX/IY,HL/IX/IY
@@ -318,6 +324,16 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
             if (result > 0xFFFF) F |= FLAG_C;
 
             return ok(useIX || useIY ? 15 : 11);
+        }
+
+        case 0xD9: { // EXX
+            std::swap(B, B_shadow); // You will need to add B_shadow, etc. to Z80.hpp
+            std::swap(C, C_shadow);
+            std::swap(D, D_shadow);
+            std::swap(E, E_shadow);
+            std::swap(H, H_shadow);
+            std::swap(L, L_shadow);
+            return 4;
         }
 
         case 0xC7: case 0xCF: case 0xD7: case 0xDF: case 0xE7: case 0xEF: case 0xF7: case 0xFF: {
@@ -402,6 +418,38 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
             return ok(10);
         }
 
+        case 0xF6: { // OR n
+            uint8_t value = FetchByte();
+            A |= value;
+
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            SetParityFlag(A);
+            F &= ~FLAG_N;
+            F &= ~FLAG_H;
+            F &= ~FLAG_C;
+
+            return ok(7);
+        }
+
+        case 0x08: { // EX AF, AF'
+            std::swap(A, A_shadow);
+            std::swap(F, F_shadow);
+            return ok(4);
+        }
+        
+        case 0x3A: { // LD A, (nn)
+            uint16_t addr = FetchWord();
+            A = readMemory(addr);
+            return ok(13);
+        }
+        
+        case 0x32: { // LD (nn), A  <-- Good to add this too if missing!
+            uint16_t addr = FetchWord();
+            writeMemory(addr, A);
+            return ok(13);
+        }
+        
         case 0xC9: // RET
             PC = PopWord();
             return ok(10);
@@ -437,7 +485,7 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
         }
 
         case 0x18: { // JR e
-            int8_t offset = static_cast<int8_t>(FetchByte());
+            int8_t offset = (int8_t)FetchByte(); // Must be signed!
             PC += offset;
             return ok(12);
         }
@@ -505,24 +553,73 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
 
             return ok(4 + (src == 6 ? 3 : 0));
         }
-    
-        case 0x98: case 0x99: case 0x9A: case 0x9B:
-        case 0x9C: case 0x9D: case 0x9E: case 0x9F: {
+        case 0x90: case 0x91: case 0x92: case 0x93:
+        case 0x94: case 0x95: case 0x96: case 0x97: { // SUB r
             uint8_t src = opcode & 0x07;
-            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
-            uint16_t result = uint16_t(A) - uint16_t(operand);
-
-            A = uint8_t(result);
-
-            F = 0;
-            F |= FLAG_N;
-            if ((A & 0x0F) > ((A - operand) & 0x0F)) { /* borrow from bit 4 */ }
-            if ((uint8_t)(A) < operand) F |= FLAG_C;
-            if ((A & 0x0F) < (operand & 0x0F)) F |= FLAG_H; // borrow from low nibble
+            uint8_t operand;
+            uint32_t cycles;
+        
+            if (useIX || useIY) {
+                int8_t d = FetchByte();
+                operand = readMemory((useIX ? IX : IY) + d);
+                cycles = 19;
+            } else {
+                operand = (src == 6 ? ReadHL() : GetReg(src));
+                cycles = 4 + (src == 6 ? 3 : 0);
+            }
+        
+            uint16_t res16 = (uint16_t)A - (uint16_t)operand;
+            uint8_t result = (uint8_t)res16;
+        
+            // Half Carry: borrow from bit 4
+            bool h = ((int32_t)(A & 0x0F) - (int32_t)(operand & 0x0F)) < 0;
+            // Overflow (V): signs of A and operand were different, 
+            // and sign of result is different from A
+            bool v = ((A ^ operand) & 0x80) && ((A ^ result) & 0x80);
+        
+            A = result;
+        
+            F = FLAG_N; // Set N for subtraction
+            if (res16 & 0x100) F |= FLAG_C;
+            if (h) F |= FLAG_H;
+            if (v) F |= FLAG_P; // Overflow bit
+            
             SetZeroFlag(A);
             SetSignFlag(A);
-            SetParityFlag(A);
-
+        
+            return ok(cycles);
+        }
+    
+        case 0x98: case 0x99: case 0x9A: case 0x9B:
+        case 0x9C: case 0x9D: case 0x9E: case 0x9F: { // SBC A, r
+            uint8_t src = opcode & 0x07;
+            uint8_t operand = (src == 6 ? ReadHL() : GetReg(src));
+            uint8_t carry = (F & FLAG_C) ? 1 : 0;
+            
+            // Use 16-bit to detect borrow (Carry)
+            uint16_t res16 = (uint16_t)A - (uint16_t)operand - (uint16_t)carry;
+            uint8_t result = (uint8_t)res16;
+        
+            // Half Carry logic: check borrow from bit 4
+            // (A & 0x0F) - (operand & 0x0F) - carry < 0
+            bool h = ((int32_t)(A & 0x0F) - (int32_t)(operand & 0x0F) - (int32_t)carry) < 0;
+        
+            // Overflow logic (V): different signs result in unexpected sign
+            // Only happens if A and operand had different signs, and result has different sign than A
+            bool v = ((A ^ operand) & 0x80) && ((A ^ result) & 0x80);
+        
+            A = result;
+        
+            // Update Flags
+            F = FLAG_N; // Always set for subtraction
+            if (res16 & 0x100) F |= FLAG_C; // Borrow occurred
+            if (h) F |= FLAG_H;
+            if (v) F |= FLAG_P; // In Z80, V and P share the same bit
+            
+            SetZeroFlag(A);
+            SetSignFlag(A);
+            // Note: Do not use SetParityFlag here; SBC uses Overflow logic
+        
             return ok(4 + (src == 6 ? 3 : 0));
         }
 
@@ -649,11 +746,130 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
             return ok(4);
         }
 
+        case 0xE6: { // AND n
+            A &= FetchByte();
+            F = FLAG_H;
+            SetZeroFlag(A); SetSignFlag(A); SetParityFlag(A);
+            return 7;
+        }
+
+        case 0xEE: { // XOR n
+            A ^= FetchByte();
+            F = 0;
+            SetZeroFlag(A); SetSignFlag(A); SetParityFlag(A);
+            return 7;
+        }
+
+        case 0xEB: { // EX DE, HL
+            uint8_t tempH = H; uint8_t tempL = L;
+            H = D; L = E;
+            D = tempH; E = tempL;
+            return 4;
+        }
+        case 0xFE: { // CP n (Immediate)
+            uint8_t operand = FetchByte();
+            uint8_t result = A - operand;
+        
+            F = FLAG_N;
+            if (A < operand) F |= FLAG_C;
+            if ((A & 0x0F) < (operand & 0x0F)) F |= FLAG_H;
+            
+            // Overflow bit (V)
+            if (((A ^ operand) & 0x80) && ((A ^ result) & 0x80)) F |= FLAG_P;
+        
+            SetZeroFlag(result);
+            SetSignFlag(result);
+            return 7;
+        }
+
+        case 0x0B: { // DEC BC
+            uint16_t bc = (uint16_t)B << 8 | C;
+            bc--;
+            B = (bc >> 8) & 0xFF;
+            C = bc & 0xFF;
+            return 6;
+        }
+
+        case 0x23: { // INC HL
+            uint16_t hl = (uint16_t)H << 8 | L;
+            hl++;
+            H = (hl >> 8) & 0xFF;
+            L = hl & 0xFF;
+            return ok(6); // Takes 6 T-states
+        }
+        
+        case 0x03: { // INC BC
+            uint16_t bc = (uint16_t)B << 8 | C;
+            bc++;
+            B = (bc >> 8) & 0xFF;
+            C = bc & 0xFF;
+            return ok(6);
+        }
+        
+        case 0x13: { // INC DE
+            uint16_t de = (uint16_t)D << 8 | E;
+            de++;
+            D = (de >> 8) & 0xFF;
+            E = de & 0xFF;
+            return ok(6);
+        }
+        
+        case 0x33: { // INC SP
+            SP++;
+            return ok(6);
+        }
+
+        case 0x1B: { // DEC DE
+            uint16_t de = (uint16_t)D << 8 | E;
+            de--;
+            D = (de >> 8) & 0xFF;
+            E = de & 0xFF;
+            return ok(6);
+        }
+        
+        case 0x2B: { // DEC HL
+            uint16_t hl = (uint16_t)H << 8 | L;
+            hl--;
+            H = (hl >> 8) & 0xFF;
+            L = hl & 0xFF;
+            return ok(6);
+        }
+        
+        case 0x3B: { // DEC SP
+            SP--;
+            return ok(6);
+        }
+
+        case 0xD6: { // SUB n
+            uint8_t n = FetchByte();
+            uint8_t res = A - n;
+            
+            // Flags
+            F = FLAG_N; // Set Subtract flag
+            if (res == 0) F |= FLAG_Z;
+            if (res & 0x80) F |= FLAG_S;
+            if (A < n) F |= FLAG_C;
+            // Half-carry: borrow from bit 4
+            if ((A & 0x0F) < (n & 0x0F)) F |= FLAG_H;
+            // Overflow
+            if (((A ^ n) & 0x80) && ((A ^ res) & 0x80)) F |= FLAG_P;
+        
+            A = res;
+            return ok(7);
+        }
+        
+        case 0xFB: { // EI
+            IFF1 = IFF2 = true;            
+            return ok(4);
+        }
+
+        default:
+            std::printf("Unimplemented Main opcode: 0x%02X at PC: 0x%04X\n", opcode, PC - 1);
+            unimplementedInstructionCount++; // Use the main counter here
+            return 4;
+
     }
     
-    unimplementedInstructionCount++;
-    LogOpcode(opcode, false);
-    return 0;
 }
 
 // -------------------------------------------------------------
@@ -833,6 +1049,7 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
             LogOpcode(opcode, true, "ED ");
             return 16;
         }
+
         case 0xA8: { // LDD
             uint8_t value = ReadHL();
             WriteDE(value);
@@ -877,6 +1094,29 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
             SetParityFlag(A);
             LogOpcode(opcode, true, "ED ");
             return 18;
+        }
+
+        case 0xB0: { // LDIR (Block Transfwer)
+            uint8_t val = readMemory(HLAddress());
+            writeMemory(DEAddress(), val);
+
+            // Increment HL and DE
+            uint16_t hl = HLAddress() + 1;
+            H = hl >> 8; L = hl & 0xFF;
+            uint16_t de = DEAddress() + 1;
+            D = de >> 8; E = de & 0xFF;
+
+            // Decrement BC
+            uint16_t bc = ((B << 8) | C) - 1;
+            B = bc >> 8; C = bc & 0xFF;
+
+            F &= ~(FLAG_H | FLAG_P | FLAG_N); // Clear N, H and P
+            if (bc != 0) {
+                F |= FLAG_P; // Set P/V if BC != 0
+                PC -= 2; // Loop the instruction (repeat ED B0)
+                return 21; // 16 for the instruction + 5 for the loop overhead
+            }
+            return 16; // Last iteration
         }
         default:
             std::printf("Unimplemented ED opcode: 0x%02X at PC: 0x%04X\n", opcode, PC -1);
@@ -1149,3 +1389,14 @@ void Z80::DumpOpcodeStats() const {
               << "\n";
 }
 
+void Z80::HandleInterrupt() {
+    // Maskable interrupts are only processed if IFF1 is true
+    if (IFF1) {
+        IFF1 = IFF2 = false; // Disable further interrupts
+        
+        PushWord(PC);        // Save current address to return later
+        PC = INT_VECTOR;     // Jump to MSX BIOS interrupt handler (0x0038)
+        
+        // Note: In a real Z80, this takes roughly 13 T-states
+    }
+}

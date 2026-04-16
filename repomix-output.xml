@@ -71,87 +71,6 @@ CMakeLists.txt
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/core/Memory/Bus.cpp">
-#include "core/Memory/Bus.hpp"
-#include <iostream>   // <--- NEEDED for std::cerr
-#include <algorithm>  // <--- NEEDED for std::copy
-#include <vector>
-#include <functional>
-
-Bus::Bus() {
-    // Initialize 64KB of RAM
-    ram.resize(64 * 1024, 0);
-}
-
-uint8_t Bus::Read(uint16_t address) {
-    if (address < ram.size()) {
-        return ram[address];
-    }
-    return 0;
-}
-
-void Bus::Write(uint16_t address, uint8_t data) {
-    if (address < ram.size()) {
-        ram[address] = data;
-    }
-}
-
-// --- I/O Mapping ---
-
-void Bus::MapIO(uint8_t port, ReadIOFunc r, WriteIOFunc w) {
-    IOMapping mapping;
-    mapping.port = port;
-    mapping.read = r;
-    mapping.write = w;
-    ioMap.push_back(mapping);
-}
-
-uint8_t Bus::IO_Read(uint8_t port) {
-    for (const auto& mapping : ioMap) {
-        if (mapping.port == port && mapping.read) {
-            return mapping.read(port);
-        }
-    }
-    return 0xFF; // Default pull-up
-}
-
-void Bus::IO_Write(uint8_t port, uint8_t data) {
-  // DIAGNOSTIC: Print every IO Write
-  std::cout << "[BUS] Writing to port: 0x" << std::hex << static_cast<int>(port)
-            << ", Data: 0x" << static_cast<int>(data) << std::endl;
-
-    for (const auto& mapping : ioMap) {
-        if (mapping.port == port && mapping.write) {
-            mapping.write(port, data);
-            return;
-        }
-    }
-}
-
-// --- Memory Mapping ---
-
-void Bus::MapMemory(uint16_t start, uint16_t end, ReadMemFunc rFunc, WriteMemFunc wFunc) {
-    MemoryMapping map;
-    map.start = start;
-    map.end = end;
-    map.read = rFunc;
-    map.write = wFunc;
-    memoryMap.push_back(map);
-}
-
-void Bus::LoadToRAM(uint16_t startAddress, const std::vector<uint8_t>& data) {
-    if (startAddress + data.size() > ram.size()) {
-        std::cerr << "LoadToRAM: Data exceeds RAM size" << std::endl;
-        return;
-    }
-    std::copy(data.begin(), data.end(), ram.begin() + startAddress);
-}
-</file>
-
-<file path="src/core/Memory/MemoryMapper.cpp">
-
-</file>
-
 <file path="src/core/PSG/AY8910.cpp">
 #include "core/PSG/AY8910.hpp"
 
@@ -200,113 +119,6 @@ int16_t AY8910::GetSample() {
 
 <file path="src/core/PSG/PSG.cpp">
 
-</file>
-
-<file path="src/core/VDP/TMS9918.cpp">
-#include "core/VDP/TMS9918.hpp"
-#include <iostream> // <--- Required for std::cout
-#include <iomanip>  // <--- Often good to include for formatting, but iostream usually handles endl/hex
-
-TMS9918::TMS9918() : vramAddress(0x0000), latchActive(false) {
-    // Initialize VRAM (16KB)
-    vram.resize(16 * 1024, 0);
-
-    // Initialize framebuffer (256x212 pixels is standard for MSX)
-    // Reserve space enough for line-by-line rendering
-    framebuffer.resize(256 * 212, 0); 
-
-    // Reset State
-    for (int i = 0; i < 8; ++i) registers[i] = 0;
-    statusReg = 0;
-    firstByteLatch = 0;
-}
-
-void TMS9918::Update(uint32_t cpuCycles) {
-    // In a real emulator, you would track the accumulated cycles
-    // and trigger VSync after a certain amount.
-    // For now, this is a placeholder.
-    (void)cpuCycles; // Suppress unused warning
-}
-
-uint8_t TMS9918::Read(uint8_t port) {
-    // Placeholder: Silence unused warning
-    (void)port;
-
-    // Port 0x98/0x99 usually reads status or data.
-    // Simplified: Return Status register
-    return statusReg;
-}
-
-// Update TMS9918::Write in src/core/VDP/TMS9918.cpp
-
-void TMS9918::Write(uint8_t port, uint8_t data) {
-    std::cout << "[TMS9918] Write() called. Port: 0x" << std::hex << (int)port 
-              << ", Data: 0x" << (int)data << std::endl;
-
-    if (port == 0x98) {
-        if (vramAddress < vram.size()) {
-            vram[vramAddress] = data;
-            //std::cout << "[VDP] VRAM Write @ 0x" << vramAddress 
-            //          << " = 0x" << (int)data << std::endl;
-        }
-        vramAddress++;
-        if (vramAddress > 0x3FFF) { vramAddress = 0; }
-        return; 
-    }
-
-    if (port == 0x99) {
-        // FIX: Check the boolean flag, not the data value
-        if (!latchActive) {
-            // --- STEP 1: First Byte ---
-            firstByteLatch = data;
-            latchActive = true; // Mark as "Busy"
-            std::cout << "[VDP] Command Byte 1 received: 0x" << (int)data << std::endl;
-        } else {
-            // --- STEP 2: Second Byte ---
-            std::cout << "[VDP] Command Byte 2 received: 0x" << (int)data << std::endl;
-
-            // Register Write?
-            if (firstByteLatch & 0x80) { 
-                uint8_t regIndex = firstByteLatch & 0x0F;
-                if (regIndex < 8) {
-                    registers[regIndex] = data;
-                    std::cout << "[VDP] RESULT: Register " << (int)regIndex 
-                              << " set to 0x" << (int)data << std::endl;
-                }
-            } 
-            // Address Write?
-            else {
-                vramAddress = ((uint16_t)data << 8) | firstByteLatch;
-                std::cout << "[VDP] RESULT: VRAM Address set to 0x" 
-                          << std::hex << vramAddress << std::endl;
-            }
-
-            // Reset for next command
-            firstByteLatch = 0;
-            latchActive = false; // Mark as "Empty"
-        }
-    }
-}
-
-const std::vector<uint8_t>& TMS9918::GetFrameBuffer() const {
-    return framebuffer;
-}
-
-// DumpVRAM routine
-void TMS9918::DumpVRAM(uint16_t start, uint16_t length) const {
-  std::cout << "--- VRAM Dump: 0x" << std::hex << start
-            << " - 0x" << (start + length) << " ---" << std::endl;
-  for (uint16_t i = 0; i < length; ++i) {
-    if ((i % 16) == 0) {
-      std::cout << std::hex << std::setw(4) << std::setfill('0') << (start + i) << ": ";
-    }
-    std::cout << std::hex << std::setw(2) << std::setfill('0')
-              << static_cast<int>(vram[start + i]) << " ";
-
-    if ((i % 16) == 15) std::cout << std::endl;
-  }
-  std::cout << std::dec << std::endl;
-}
 </file>
 
 <file path="src/core/VDP/VDP.cpp">
@@ -359,23 +171,243 @@ std::vector<uint8_t> FileManager::LoadDSK(const std::string& filename) { return 
 
 </file>
 
+<file path="src/core/Memory/Bus.cpp">
+#include "Bus.hpp"
+#include <algorithm>
+#include <iostream>
+
+Bus::Bus() {
+    // Constructor
+}
+
+void Bus::LoadToRAM(uint16_t address, const std::vector<uint8_t>& data) {
+    if (address == 0x0000) {
+        biosBuffer = data;
+    }
+}
+
+uint8_t Bus::Read(uint16_t address) {
+    // Check our loaded BIOS first
+    if (address < biosBuffer.size()) {
+        return biosBuffer[address];
+    }
+    
+    // Fallback to mapper
+    return mapper.Read(address);
+}
+
+void Bus::Write(uint16_t address, uint8_t data) {
+    // You usually can't write to ROM (0x0000-0x7FFF), 
+    // but you can let the mapper decide
+    mapper.Write(address, data);
+}
+
+void Bus::MapMemory(uint16_t start, uint16_t end, ReadMemFunc rFunc, WriteMemFunc wFunc) {
+    memoryMap.push_back({start, end, rFunc, wFunc});
+}
+
+void Bus::MapIO(uint8_t port, ReadIOFunc r, WriteIOFunc w) {
+    ioMap.push_back({port, r, w});
+}
+
+uint8_t Bus::IO_Read(uint8_t port) {
+    for (const auto& mapping : ioMap) {
+        if (mapping.port == port && mapping.read) {
+            return mapping.read(port);
+        }
+    }
+    return 0xFF; // Open bus returns 0xFF
+}
+
+void Bus::IO_Write(uint8_t port, uint8_t data) {
+    // MSX CRITICAL: Port 0xA8 is the Primary Slot Register
+    if (port == 0xA8) {
+        mapper.WritePortA8(data);
+        return; 
+    }
+
+    for (const auto& mapping : ioMap) {
+        if (mapping.port == port && mapping.write) {
+            mapping.write(port, data);
+            return;
+        }
+    }
+}
+</file>
+
+<file path="src/core/Memory/MemoryMapper.cpp">
+#include "core/Memory/MemoryMapper.hpp"
+
+MemoryMapper::MemoryMapper() {
+    primarySlotRegister = 0x00; // Default: All pages point to Slot 0
+}
+
+void MemoryMapper::WritePortA8(uint8_t value) {
+    primarySlotRegister = value;
+}
+
+int MemoryMapper::GetSlotForAddress(uint16_t address) {
+    // Page 0: 0000-3FFF, Page 1: 4000-7FFF, etc.
+    int page = address / 0x4000;
+    // Extract 2 bits for the specific page from Port A8
+    return (primarySlotRegister >> (page * 2)) & 0x03;
+}
+
+uint8_t MemoryMapper::Read(uint16_t address) {
+    int slotIdx = GetSlotForAddress(address);
+    for (auto& dev : slots[slotIdx]) {
+        if (address >= dev.start && address <= dev.end) {
+            return dev.buffer[address - dev.start];
+        }
+    }
+    return 0xFF; // Open bus returns 0xFF
+}
+
+void MemoryMapper::Write(uint16_t address, uint8_t value) {
+    int slotIdx = GetSlotForAddress(address);
+    for (auto& dev : slots[slotIdx]) {
+        if (address >= dev.start && address <= dev.end) {
+            if (!dev.isReadOnly) {
+                dev.buffer[address - dev.start] = value;
+            }
+            return;
+        }
+    }
+}
+
+void MemoryMapper::InsertDevice(int slot, uint16_t start, uint16_t end, const std::vector<uint8_t>& data, bool readOnly) {
+    slots[slot].push_back({data, start, end, readOnly});
+}
+</file>
+
+<file path="src/core/VDP/TMS9918.cpp">
+#include "TMS9918.hpp"
+#include <iostream>
+#include <iomanip>
+
+TMS9918::TMS9918() 
+    : statusReg(0), 
+      currentAddress(0), 
+      addressBuffer(0), 
+      addressLatch(false) 
+{
+    vram.resize(16 * 1024, 0);        // 16KB VRAM
+    framebuffer.resize(256 * 192, 0); // Standard TMS resolution
+    for(int i=0; i<8; ++i) registers[i] = 0;
+}
+
+// Port 0x99: Control/Address/Register writes
+void TMS9918::WriteControl(uint8_t data) {
+    if (!addressLatch) {
+        // First byte: Store low 8 bits
+        addressBuffer = data;
+        addressLatch = true;
+    } else {
+        // Second byte: 
+        // Bits 0-5: High 6 bits of address
+        // Bits 6-7: Mode (00=Read, 01=Write VRAM, 10=Reg Write)
+        uint8_t mode = (data >> 6) & 0x03;
+        
+        // Combine addressBuffer (low) and data (high 6 bits)
+        currentAddress = ((static_cast<uint16_t>(data) & 0x3F) << 8) | addressBuffer;
+
+        if (mode == 0x02) { // 10 in binary: Register Write
+            uint8_t regNum = data & 0x07;
+            registers[regNum] = addressBuffer;
+        }
+        
+        // IMPORTANT: In MSX, any write to Port 0x99 resets the latch
+        addressLatch = false;
+        
+        // Debug to verify address setup
+        // std::cout << "VDP Address set to: " << std::hex << currentAddress << std::dec << " Mode: " << (int)mode << std::endl;
+    }
+}
+
+// Port 0x98: Data writes (with auto-increment)
+void TMS9918::WriteData(uint8_t data) {
+    std::cout << "DEBUG: VDP Writing " << std::hex << (int)data << " to " << currentAddress << std::dec << std::endl;
+    vram[currentAddress & 0x3FFF] = data;
+    currentAddress++;
+    addressLatch = false;
+}
+
+// Port 0x98: Data reads
+uint8_t TMS9918::ReadData() {
+    uint8_t data = vram[currentAddress & 0x3FFF];
+    currentAddress++;
+    addressLatch = false;
+    return data;
+}
+
+// Port 0x99: Status reads
+uint8_t TMS9918::ReadStatus() {
+    uint8_t status = statusReg;
+    // Reading status clears the top bits (Interrupt and Collision flags)
+    statusReg &= 0x1F; 
+    addressLatch = false;
+    return status;
+}
+
+void TMS9918::Update(uint32_t cpuCycles) {
+    // Placeholder for future scanline/timing logic
+}
+
+const std::vector<uint8_t>& TMS9918::GetFrameBuffer() const {
+    return framebuffer;
+}
+
+void TMS9918::DumpVRAM(uint16_t start, uint16_t length) const {
+    std::cout << "--- VRAM Dump: 0x" << std::hex << start << " ---" << std::endl;
+    for (uint16_t i = 0; i < length; ++i) {
+        if ((start + i) >= vram.size()) break;
+        std::cout << std::setw(2) << std::setfill('0') << (int)vram[start + i] << " ";
+        if ((i + 1) % 16 == 0) std::cout << std::endl;
+    }
+    std::cout << std::dec << std::endl;
+}
+</file>
+
 <file path="src/main.cpp">
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include "core/Emulator.hpp"
 
+// Helper function to load binary files
+std::vector<uint8_t> LoadFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<uint8_t> buffer(size);
+    if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+        return buffer;
+    }
+    return {};
+}
+
 int main() {
-    Emulator emulator;
+    try {
+        Emulator emulator;
+        
+        // 1. Load the BIOS
+        auto bios = LoadFile("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/cbios_main_msx1.rom");
+        
+        // 2. Initialize (this maps the BIOS and resets the Z80)
+        emulator.Initialize(bios);
 
-    // Use an absolute path for the BIOS ROM so the executable works
-    // consistently regardless of the current working directory.
-    emulator.LoadSystemROM("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/assets/roms/zexall.com");
+        // 3. Run the frame (Added parentheses here)
+        emulator.RunFrame();
 
-    std::cout << "Attempting to run a frame..." << std::endl;
-    emulator.EnableOpcodeTrace(true);
-    emulator.RunFrame();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 
-    std::cout << "Frame execution finished." << std::endl;
-    emulator.GetVDP().DumpVRAM(0x2000, 16); // Dump first 16 bytes
     return 0;
 }
 </file>
@@ -383,6 +415,8 @@ int main() {
 <file path="tests/test_z80.cpp">
 #include "core/CPU/Z80.hpp"
 #include <gtest/gtest.h>   // or <catch2/catch_test_macros.hpp>
+#include "core/Memory/Bus.hpp"          // Add this
+#include "core/Memory/MemoryMapper.hpp"  // Add this
 
 // Shared test memory buffer + callbacks
 static uint8_t memory[65536];
@@ -393,14 +427,6 @@ static void    TestWriteMemory(uint16_t addr, uint8_t v) { memory[addr] = v; }
 // I/O tests, future proofing.
 static uint8_t lastPortWritten = 0;
 static uint8_t lasPortValue    = 0;
-
-static void TestgWriteIO(uint8_t port, uint8_t value) {
-  lastPortWritten = port;
-  lasPortValue = value;
-}
-static uint8_t TestReadIO(uint8_t port) {
-  return 0x42; // example dummy value
-}
 
 // --- SECTION 1: INC r ---
 TEST(Z80, INC_Registers) {
@@ -655,6 +681,130 @@ TEST(Z80, JP_C_taken)   {
 
   EXPECT_EQ(cpu.PC, 0x2000);
 }
+
+TEST(MemoryMapperTest, SlotSwitching) {
+    MemoryMapper mapper;
+
+    // Slot 0: BIOS (Read Only)
+    std::vector<uint8_t> bios(0x4000, 0xF1); 
+    mapper.InsertDevice(0, 0x0000, 0x3FFF, bios, true);
+
+    // Slot 1: RAM (Writable)
+    std::vector<uint8_t> ram(0x4000, 0x00);
+    mapper.InsertDevice(1, 0x0000, 0x3FFF, ram, false);
+
+    // Set Port 0xA8 to Slot 0 for Page 0 (bits 0-1 = 00)
+    mapper.WritePortA8(0x00);
+    EXPECT_EQ(mapper.Read(0x0000), 0xF1);
+
+    // Set Port 0xA8 to Slot 1 for Page 0 (bits 0-1 = 01)
+    mapper.WritePortA8(0x01);
+    mapper.Write(0x0000, 0x42);
+    EXPECT_EQ(mapper.Read(0x0000), 0x42);
+
+    // Switch back to Slot 0 (BIOS) - should still be 0xF1
+    mapper.WritePortA8(0x00);
+    EXPECT_EQ(mapper.Read(0x0000), 0xF1);
+}
+
+TEST(BusTest, LoadAndReadBack) {
+    Bus bus;
+    
+    // 1. Setup a dummy RAM block in Slot 0 for the whole 64KB range
+    std::vector<uint8_t> dummyRam(0x10000, 0);
+    
+    // Use the new proxy method instead of the bus.mapper.InsertDvice
+    bus.InsertDevice(0, 0x0000, 0xFFFF, dummyRam, false);
+
+    // To set A8, use your existing IO_Write
+    bus.IO_Write(0xA8, 0x00); // Point all pages to Slot 0
+    
+    // 2. Load some data
+    std::vector<uint8_t> testData = {0x01, 0x02, 0x03, 0x04};
+    bus.LoadToRAM(0xC000, testData);
+    
+    // 3. Verify
+    EXPECT_EQ(bus.Read(0xC000), 0x01);
+    EXPECT_EQ(bus.Read(0xC003), 0x04);
+}
+
+TEST(MSX_Integration, BootSlotState) {
+    Bus bus;
+    
+    // 1. Use the new bridge method instead of bus.mapper
+    std::vector<uint8_t> bios(0x4000, 0xF3);
+    bus.InsertDevice(0, 0x0000, 0x3FFF, bios, true);
+    
+    std::vector<uint8_t> ram(0x4000, 0x00);
+    bus.InsertDevice(3, 0xC000, 0xFFFF, ram, false);
+
+    // 2. Use IO_Write to change slots (this tests the Mapper through the Port 0xA8 logic)
+    bus.IO_Write(0xA8, 0x00); // Select Slot 0 for all pages
+    
+    EXPECT_EQ(bus.Read(0x0000), 0xF3);
+}
+</file>
+
+<file path="CMakeLists.txt">
+cmake_minimum_required(VERSION 3.20)
+project(msx-emulator VERSION 0.1 LANGUAGES CXX)
+
+# Set C++ Standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Add compiler warnings
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Collect core source files
+file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
+    "src/*.cpp"
+    "src/*.c"
+)
+
+# Exclude the application entry-point from the library sources
+list(FILTER CORE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
+
+# Core library target
+add_library(msx_emulator_core STATIC ${CORE_SOURCES})
+
+target_include_directories(msx_emulator_core
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/include
+)
+
+target_compile_features(msx_emulator_core PUBLIC cxx_std_20)
+
+# Threads (often needed for audio/video)
+find_package(Threads REQUIRED)
+
+target_link_libraries(msx_emulator_core PUBLIC Threads::Threads)
+
+# Executable target
+add_executable(msx-emulator src/main.cpp)
+target_link_libraries(msx-emulator PRIVATE msx_emulator_core Threads::Threads)
+
+# Fetch GoogleTest for unit/integration tests
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+# Enable testing support
+include(CTest)
+enable_testing()
+
+add_subdirectory(tests)
 </file>
 
 <file path="src/core/CPU/Z80.cpp">
@@ -1539,8 +1689,8 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
             return 18;
         }
         default:
+            std::printf("Unimplemented ED opcode: 0x%02X at PC: 0x%04X\n", opcode, PC -1);
             unimplementedEDCount++;
-            LogOpcode(opcode, false, "ED ");
             return 8;
     }
 }
@@ -1839,18 +1989,24 @@ Emulator::Emulator()
 
     // MAP IO DEVICES
 
-    // VDP DATA (0x98)
-    bus.MapIO(
-        0x98,
-        [this](uint8_t port) { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
+    // Port 0x98: VDP Data Port
+    bus.MapIO(0x98, 
+        [this](uint8_t) { 
+            return vdp.ReadData(); 
+        }, 
+        [this](uint8_t portVal, uint8_t dataVal) { 
+            vdp.WriteData(dataVal); 
+        }
     );
 
-    // VDP CTRL (0x99)
-    bus.MapIO(
-        0x99,
-        [this](uint8_t port) { return vdp.Read(port); },
-        [this](uint8_t port, uint8_t val) { vdp.Write(port, val); }
+    // Port 0x99: VDP Control/Status Port
+    bus.MapIO(0x99, 
+        [this](uint8_t) { 
+            return vdp.ReadStatus(); 
+        }, 
+        [this](uint8_t portVal, uint8_t dataVal) { 
+            vdp.WriteControl(dataVal); 
+        }
     );
 
     // PSG ADDR (0xA0)
@@ -1898,68 +2054,16 @@ void Emulator::RunFrame() {
     // Dump VRAM for debugging
     vdp.DumpVRAM(0x2000, 16);
 }
-</file>
 
-<file path="CMakeLists.txt">
-cmake_minimum_required(VERSION 3.20)
-project(msx-emulator VERSION 0.1 LANGUAGES CXX)
-
-# Set C++ Standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Add compiler warnings
-if(MSVC)
-    add_compile_options(/W4)
-else()
-    add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
-
-# Collect core source files
-file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
-    "src/*.cpp"
-    "src/*.c"
-)
-
-# Exclude the application entry-point from the library sources
-list(FILTER CORE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
-
-# Core library target
-add_library(msx_emulator_core STATIC ${CORE_SOURCES})
-
-target_include_directories(msx_emulator_core
-    PUBLIC
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/include
-)
-
-target_compile_features(msx_emulator_core PUBLIC cxx_std_20)
-
-# Threads (often needed for audio/video)
-find_package(Threads REQUIRED)
-
-target_link_libraries(msx_emulator_core PUBLIC Threads::Threads)
-
-# Executable target
-add_executable(msx-emulator src/main.cpp)
-target_link_libraries(msx-emulator PRIVATE msx_emulator_core Threads::Threads)
-
-# Fetch GoogleTest for unit/integration tests
-include(FetchContent)
-
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-# Enable testing support
-include(CTest)
-enable_testing()
-
-add_subdirectory(tests)
+void Emulator::Initialize(const std::vector<uint8_t>& bios) {
+    // 1. Load the BIOS bytes into memory
+    bus.LoadToRAM(0x0000, bios);
+    
+    // 2. Ensure the CPU starts at the beginning
+    z80.Reset(); 
+    
+    std::cout << "System initialized: BIOS loaded to 0x0000" << std::endl;
+}
 </file>
 
 </files>

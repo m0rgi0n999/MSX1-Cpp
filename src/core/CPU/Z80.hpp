@@ -15,6 +15,7 @@ public:
     // ================================
     uint32_t ExecuteInstruction();
     void Reset();
+    void HandleInterrupt();
 
     // ================================
     // Public Getters
@@ -52,12 +53,24 @@ public:
     uint16_t PC;
     uint16_t SP;
 
+    // --- Shadow Registers (Alternate Set) ---
+    uint8_t A_shadow, F_shadow;
+    uint8_t B_shadow, C_shadow;
+    uint8_t D_shadow, E_shadow;
+    uint8_t H_shadow, L_shadow;    
+
     bool traceOpcodes = false;
     bool traceUnimplementedOpcodes = false;
     uint32_t executedInstructionCount = 0;
     uint32_t unimplementedInstructionCount = 0;
     uint32_t unimplementedCBCount = 0;
     uint32_t unimplementedEDCount = 0;
+
+    // IFF
+    bool IFF1 = false;
+    bool IFF2 = false;
+    uint8_t interruptMode = 1;
+    static const uint16_t INT_VECTOR = 0x0038;
 
     void DumpOpcodeStats() const;
 
