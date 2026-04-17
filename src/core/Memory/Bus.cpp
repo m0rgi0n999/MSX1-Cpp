@@ -13,18 +13,10 @@ void Bus::LoadToRAM(uint16_t address, const std::vector<uint8_t>& data) {
 }
 
 uint8_t Bus::Read(uint16_t address) {
-    // Check our loaded BIOS first
-    if (address < biosBuffer.size()) {
-        return biosBuffer[address];
-    }
-    
-    // Fallback to mapper
     return mapper.Read(address);
 }
 
 void Bus::Write(uint16_t address, uint8_t data) {
-    // You usually can't write to ROM (0x0000-0x7FFF), 
-    // but you can let the mapper decide
     mapper.Write(address, data);
 }
 

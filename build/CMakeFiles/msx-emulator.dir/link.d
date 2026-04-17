@@ -4,6 +4,8 @@ msx-emulator: \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o \
   CMakeFiles/msx-emulator.dir/src/main.cpp.o \
   libmsx_emulator_core.a \
+  /usr/lib64/libSDL2main.a \
+  /usr/lib64/libSDL2-2.0.so.0.3200.64 \
   /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
@@ -41,6 +43,10 @@ msx-emulator: \
 CMakeFiles/msx-emulator.dir/src/main.cpp.o:
 
 libmsx_emulator_core.a:
+
+/usr/lib64/libSDL2main.a:
+
+/usr/lib64/libSDL2-2.0.so.0.3200.64:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so:
 

@@ -1,9 +1,11 @@
 #pragma once
-#include "CPU/Z80.hpp"
 #include "Memory/Bus.hpp"
+#include "CPU/Z80.hpp"
 #include "VDP/TMS9918.hpp"
 #include "PSG/AY8910.hpp"
 #include <string>
+#include <vector>
+#include <cstdint>
 
 class Emulator {
 public:
@@ -34,9 +36,15 @@ public:
     // Your main loop methods...
     void RunFrame();
 
+    void DumpVideo() {
+      vdp.DebugPrintScreen();
+    }
+
+    TMS9918& GetVDP() { return vdp; }
+
 private:
-    Z80 z80;
     Bus bus;
+    Z80 z80;
     TMS9918 vdp;
     AY8910 psg;
 
@@ -48,4 +56,3 @@ private:
 
     void MapIODevices(); // Connect VDP and PSG to the Bus I/O ports
 };
-

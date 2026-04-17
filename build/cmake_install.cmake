@@ -1,4 +1,4 @@
-# Install script for directory: /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator
+# Install script for directory: /home/erwin/MSX1-Cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,23 +39,13 @@ endif()
 
 # Set path to fallback-tool for dependency-resolution.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/_deps/googletest-build/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/tests/cmake_install.cmake")
+  set(CMAKE_OBJDUMP "/usr/sbin/objdump")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/install_local_manifest.txt"
+  file(WRITE "/home/erwin/MSX1-Cpp/build/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -71,6 +61,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/erwin/MSX1-Cpp/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

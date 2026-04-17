@@ -1,1 +1,1 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/msx-emulator.dir/link.d "CMakeFiles/msx-emulator.dir/src/main.cpp.o" -o msx-emulator  libmsx_emulator_core.a
+/usr/sbin/c++ -Wl,--dependency-file=CMakeFiles/msx-emulator.dir/link.d "CMakeFiles/msx-emulator.dir/src/main.cpp.o" -o msx-emulator  libmsx_emulator_core.a /usr/lib64/libSDL2main.a /usr/lib64/libSDL2-2.0.so.0.3200.64

@@ -1,7 +1,6 @@
 CMakeFiles/msx_emulator_core.dir/src/core/VDP/TMS9918.cpp.o: \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp \
- /usr/include/stdc-predef.h \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.hpp \
+ /home/erwin/MSX1-Cpp/src/core/VDP/TMS9918.cpp /usr/include/stdc-predef.h \
+ /home/erwin/MSX1-Cpp/src/core/VDP/TMS9918.hpp \
  /usr/include/c++/15/cstdint \
  /usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h \
  /usr/include/bits/wordsize.h \

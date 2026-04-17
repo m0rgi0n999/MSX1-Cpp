@@ -23,6 +23,10 @@ public:
     const std::vector<uint8_t>& GetFrameBuffer() const;
 
     void DumpVRAM(uint16_t start, uint16_t length) const;
+    
+    void RenderScreen0(uint32_t* pixelBuffer);
+
+    void DebugPrintScreen();
 
 private:
     // Internal Memory

@@ -1,8 +1,6 @@
 CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.o: \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp \
- /usr/include/stdc-predef.h \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.hpp \
- /usr/include/c++/15/cstdint \
+ /home/erwin/MSX1-Cpp/src/core/Memory/Bus.cpp /usr/include/stdc-predef.h \
+ /home/erwin/MSX1-Cpp/src/core/Memory/Bus.hpp /usr/include/c++/15/cstdint \
  /usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h \
  /usr/include/bits/wordsize.h \
  /usr/include/c++/15/x86_64-redhat-linux/bits/os_defines.h \
@@ -74,7 +72,7 @@ CMakeFiles/msx_emulator_core.dir/src/core/Memory/Bus.cpp.o: \
  /usr/include/c++/15/bits/enable_special_members.h \
  /usr/include/c++/15/bits/node_handle.h \
  /usr/include/c++/15/bits/erase_if.h /usr/include/c++/15/array \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.hpp \
+ /home/erwin/MSX1-Cpp/src/core/Memory/MemoryMapper.hpp \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \
  /usr/include/c++/15/bits/algorithmfwd.h \
  /usr/include/c++/15/bits/stl_heap.h \

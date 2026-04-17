@@ -1,7 +1,9 @@
+#include <iostream>
 #include "core/Memory/MemoryMapper.hpp"
 
 MemoryMapper::MemoryMapper() {
-    primarySlotRegister = 0x00; // Default: All pages point to Slot 0
+  primarySlotRegister = 0x00;
+  ; // Default: All pages point to Slot 0
 }
 
 void MemoryMapper::WritePortA8(uint8_t value) {
@@ -17,6 +19,15 @@ int MemoryMapper::GetSlotForAddress(uint16_t address) {
 
 uint8_t MemoryMapper::Read(uint16_t address) {
     int slotIdx = GetSlotForAddress(address);
+
+    // If we are hitting the interrupt vector and getting 0xFF, something is wrong
+    /*if (address == 0x0038) {
+      std::cout << "MAPPER DEBUG: Reading 0x0038. SlotIdx: " << slotIdx
+                << "RegA8: " << (int)primarySlotRegister
+                << " DeviceCount in Slot: " << slots[slotIdx].size() << std::endl;
+    }
+    */
+
     for (auto& dev : slots[slotIdx]) {
         if (address >= dev.start && address <= dev.end) {
             return dev.buffer[address - dev.start];

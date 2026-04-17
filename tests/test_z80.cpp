@@ -1,7 +1,24 @@
+#include "core/Memory/Bus.hpp"
 #include "core/CPU/Z80.hpp"
 #include <gtest/gtest.h>   // or <catch2/catch_test_macros.hpp>
 #include "core/Memory/Bus.hpp"          // Add this
 #include "core/Memory/MemoryMapper.hpp"  // Add this
+
+class Z80Fixture : public ::testing::Test {
+protected:
+    Bus bus;
+    Z80 cpu;
+
+    Z80Fixture() : cpu() { // Z80 default constructor
+        // Link the CPU to the test bus via lambdas
+        cpu.readMemory = [this](uint16_t addr) { return bus.Read(addr); };
+        cpu.writeMemory = [this](uint16_t addr, uint8_t val) { bus.Write(addr, val); };
+    }
+
+    void SetUp() override {
+        cpu.Reset();
+    }
+};
 
 // Shared test memory buffer + callbacks
 static uint8_t memory[65536];
@@ -13,9 +30,27 @@ static void    TestWriteMemory(uint16_t addr, uint8_t v) { memory[addr] = v; }
 static uint8_t lastPortWritten = 0;
 static uint8_t lasPortValue    = 0;
 
+static uint8_t test_memory[0x10000];
+
+class Z80Test : public ::testing::Test {
+protected:
+    Bus bus;
+    Z80 cpu;
+
+    Z80Test() : cpu(bus) {} // Pass the bus to the CPU
+
+    void SetUp() override {
+        // Clear memory before each test
+        std::fill(std::begin(test_memory), std::end(test_memory), 0);
+        
+        // Map the test_memory to the bus so the CPU can see it
+        // We'll map the whole 64KB range to our array
+        bus.MapIO(0x00, nullptr, nullptr); // Just an example if needed
+    }
+};
+
 // --- SECTION 1: INC r ---
-TEST(Z80, INC_Registers) {
-  Z80 cpu;
+TEST_F(Z80, INC_Registers) {
 
   cpu.readMemory = TestReadMemory;
   cpu.writeMemory = TestWriteMemory;
@@ -49,8 +84,7 @@ TEST(Z80, INC_Registers) {
 }
 
 // --- SECTION 2: INC (HL) ---
-TEST(Z80, INC_at_HL) {
-  Z80 cpu;
+TEST_F(Z80, INC_at_HL) {
 
   cpu.readMemory = TestReadMemory;
   cpu.writeMemory = TestWriteMemory;
@@ -69,8 +103,7 @@ TEST(Z80, INC_at_HL) {
 }
 
 // --- SECTION 3: DEC r ---
-TEST(Z80, DEC_Registers) {
-  Z80 cpu;
+TEST_F(Z80, DEC_Registers) {
     
   cpu.readMemory = TestReadMemory;
   cpu.writeMemory = TestWriteMemory;
@@ -104,8 +137,7 @@ TEST(Z80, DEC_Registers) {
 }
 
 // --- SECTION 4: DEC (HL) ---
-TEST(Z80, DEC_at_HL) {
-  Z80 cpu;
+TEST_F(Z80, DEC_at_HL) {
 
   cpu.readMemory = TestReadMemory;
   cpu.writeMemory = TestWriteMemory;
@@ -125,8 +157,7 @@ TEST(Z80, DEC_at_HL) {
 }
 
 // --- SECTION 5: LD r,(HL) ---
-TEST(Z80, LD_r_from_HL) {
-  Z80 cpu;
+TEST_F(Z80, LD_r_from_HL) {
 
   cpu.readMemory = TestReadMemory;
 
@@ -159,8 +190,7 @@ TEST(Z80, LD_r_from_HL) {
 }
 
 // --- SECTION 6: LD (HL),r ---
-TEST(Z80, LD_HL_from_r) {
-  Z80 cpu;
+TEST_F(Z80, LD_HL_from_r) {
 
   cpu.readMemory = TestReadMemory;
   cpu.writeMemory = TestWriteMemory;
@@ -206,8 +236,7 @@ TEST(Z80, LD_HL_from_r) {
 }
 
 // --- SECTION 7: JP Z/NC/C ---
-TEST(Z80, JP_Z_taken)   {
-  Z80 cpu;
+TEST_F(Z80, JP_Z_taken)   {
   cpu.readMemory = TestReadMemory;
 
   memory[0] = 0xCA;
@@ -221,7 +250,7 @@ TEST(Z80, JP_Z_taken)   {
 
   EXPECT_EQ(cpu.PC, 0x1234);
 }
-TEST(Z80, JP_Z_not_taken)   {
+TEST_F(Z80, JP_Z_not_taken)   {
   Z80 cpu;
   cpu.readMemory = TestReadMemory;
   
@@ -236,8 +265,7 @@ TEST(Z80, JP_Z_not_taken)   {
 
   EXPECT_EQ(cpu.PC, 3); // advanced normally
 }
-TEST(Z80, JP_NC_taken)  {
-  Z80 cpu;
+TEST_F(Z80, JP_NC_taken)  {
   cpu.readMemory = TestReadMemory;
 
   memory[0] = 0xD2;
@@ -251,8 +279,7 @@ TEST(Z80, JP_NC_taken)  {
 
   EXPECT_EQ(cpu.PC, 0x4020);
 }
-TEST(Z80, JP_C_taken)   {
-  Z80 cpu;
+TEST_F(Z80, JP_C_taken)   {
   cpu.readMemory = TestReadMemory;
 
   memory[0] = 0xDA;
@@ -267,7 +294,7 @@ TEST(Z80, JP_C_taken)   {
   EXPECT_EQ(cpu.PC, 0x2000);
 }
 
-TEST(MemoryMapperTest, SlotSwitching) {
+TEST_F(MemoryMapperTest, SlotSwitching) {
     MemoryMapper mapper;
 
     // Slot 0: BIOS (Read Only)
@@ -292,7 +319,7 @@ TEST(MemoryMapperTest, SlotSwitching) {
     EXPECT_EQ(mapper.Read(0x0000), 0xF1);
 }
 
-TEST(BusTest, LoadAndReadBack) {
+TEST_F(BusTest, LoadAndReadBack) {
     Bus bus;
     
     // 1. Setup a dummy RAM block in Slot 0 for the whole 64KB range
@@ -313,7 +340,7 @@ TEST(BusTest, LoadAndReadBack) {
     EXPECT_EQ(bus.Read(0xC003), 0x04);
 }
 
-TEST(MSX_Integration, BootSlotState) {
+TEST_F(MSX_Integration, BootSlotState) {
     Bus bus;
     
     // 1. Use the new bridge method instead of bus.mapper

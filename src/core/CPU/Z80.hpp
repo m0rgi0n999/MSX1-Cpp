@@ -1,20 +1,37 @@
 #pragma once
+#ifndef Z80_HPP
+#define Z80_HPP
+
 #include <cstdint>
 #include <functional>
+#include <string>
+#include <vector>
+
+// 1. ADD THIS FORWARD DECLARATION HERE
+class Bus;
+
+// 2. DEFINE TYPES FIRST
+using ReadMemFunc  = std::function<uint8_t(uint16_t)>;
+using WriteMemFunc = std::function<void(uint16_t, uint8_t)>;
+using ReadIOFunc   = std::function<uint8_t(uint8_t)>;
+using WriteIOFunc  = std::function<void(uint8_t, uint8_t)>;
 
 class Z80 {
 public:
-    // ================================
-    // Constructor / Destructor
-    // ================================
-    Z80();
-    ~Z80() = default;
+    // 2. NOW THESE TPES ARE VALID
+    ReadMemFunc  readMemory;
+    WriteMemFunc writeMemory;
+    ReadIOFunc   readIO;
+    WriteIOFunc  writeIO;
+
+    Z80(Bus& busRef);
+    virtual ~Z80() = default;
 
     // ================================
     // Execution
     // ================================
-    uint32_t ExecuteInstruction();
     void Reset();
+    uint32_t ExecuteInstruction();
     void HandleInterrupt();
 
     // ================================
@@ -23,35 +40,6 @@ public:
     uint16_t GetPC() const { return PC; }
     uint16_t GetSP() const { return SP; }
     uint8_t  GetA()  const { return A; }
-
-    // ================================
-    // CALLBACK TYPES (std::function!)
-    // ================================
-    using ReadMemFunc  = std::function<uint8_t(uint16_t)>;
-    using WriteMemFunc = std::function<void(uint16_t, uint8_t)>;
-
-    using ReadIOFunc   = std::function<uint8_t(uint8_t)>;
-    using WriteIOFunc  = std::function<void(uint8_t, uint8_t)>;
-
-    // ================================
-    // CALLBACK FIELDS (public)
-    // ================================
-    ReadMemFunc  readMemory;
-    WriteMemFunc writeMemory;
-    ReadIOFunc   readIO;
-    WriteIOFunc  writeIO;
-
-    // ================================
-    // Registers (public for unit tests)
-    // ================================
-    uint8_t A, F;
-    uint8_t B, C;
-    uint8_t D, E;
-    uint8_t H, L;
-    uint16_t IX, IY;
-
-    uint16_t PC;
-    uint16_t SP;
 
     // --- Shadow Registers (Alternate Set) ---
     uint8_t A_shadow, F_shadow;
@@ -67,9 +55,6 @@ public:
     uint32_t unimplementedEDCount = 0;
 
     // IFF
-    bool IFF1 = false;
-    bool IFF2 = false;
-    uint8_t interruptMode = 1;
     static const uint16_t INT_VECTOR = 0x0038;
 
     void DumpOpcodeStats() const;
@@ -86,7 +71,20 @@ public:
     static constexpr uint8_t FLAG_Z = 0x40;
     static constexpr uint8_t FLAG_S = 0x80;
 
+    // Member functions for reading/writing
+    uint8_t CPURead(uint16_t addr);
+    void CPUWrite(uint16_t addr, uint8_t val);
+
 private:
+    // 3. REORDER THESE TO MATCH YOUR CONSTRUCTOR TO FIX -Wreorder
+    Bus& bus;
+    uint8_t A, F, B, C, D, E, H, L;
+    uint16_t PC, SP, IX, IY;
+    uint8_t I, R;
+    bool halted;
+    int interruptMode;
+    bool IFF1, IFF2;
+
     // ================================
     // Opcode execution
     // ================================
@@ -136,3 +134,6 @@ inline constexpr uint8_t FLAG_H = Z80::FLAG_H;
 inline constexpr uint8_t FLAG_Y = Z80::FLAG_Y;
 inline constexpr uint8_t FLAG_Z = Z80::FLAG_Z;
 inline constexpr uint8_t FLAG_S = Z80::FLAG_S;
+
+
+#endif

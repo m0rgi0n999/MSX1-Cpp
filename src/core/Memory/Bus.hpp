@@ -39,6 +39,7 @@ public:
     void InsertDevice(int slot, uint16_t start, uint16_t end, const std::vector<uint8_t>& data, bool readOnly) {
         mapper.InsertDevice(slot, start, end, data, readOnly);
     }
+    MemoryMapper mapper;  
 
 private:
     // Internal Struct for IO Mapping
@@ -57,7 +58,6 @@ private:
     };
 
     std::vector<uint8_t> biosBuffer; // Temporary storage for BIOS data
-    MemoryMapper mapper;
     std::vector<IOMapping> ioMap;
     std::vector<MemoryMapping> memoryMap;
 };

@@ -3,31 +3,31 @@
 cmake_policy(SET CMP0009 NEW)
 
 # CORE_SOURCES at CMakeLists.txt:16 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/*.c")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/erwin/MSX1-Cpp/src/*.c")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "/home/erwin/MSX1-Cpp/build/CMakeFiles/cmake.verify_globs")
 endif()
 
 # CORE_SOURCES at CMakeLists.txt:16 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/*.cpp")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/erwin/MSX1-Cpp/src/*.cpp")
 set(OLD_GLOB
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/CPU/Z80.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Emulator.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/Bus.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/Memory/MemoryMapper.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/AY8910.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/PSG/PSG.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/TMS9918.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/core/VDP/VDP.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/FileManager.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/io/InputManager.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/main.cpp"
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/CPU/Z80.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/Emulator.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/Memory/Bus.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/Memory/MemoryMapper.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/PSG/AY8910.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/PSG/PSG.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/VDP/TMS9918.cpp"
+  "/home/erwin/MSX1-Cpp/src/core/VDP/VDP.cpp"
+  "/home/erwin/MSX1-Cpp/src/io/FileManager.cpp"
+  "/home/erwin/MSX1-Cpp/src/io/InputManager.cpp"
+  "/home/erwin/MSX1-Cpp/src/main.cpp"
+  "/home/erwin/MSX1-Cpp/src/utils/Logger.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/build/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "/home/erwin/MSX1-Cpp/build/CMakeFiles/cmake.verify_globs")
 endif()

@@ -1,3 +1,2 @@
 CMakeFiles/msx_emulator_core.dir/src/utils/Logger.cpp.o: \
- /home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/utils/Logger.cpp \
- /usr/include/stdc-predef.h
+ /home/erwin/MSX1-Cpp/src/utils/Logger.cpp /usr/include/stdc-predef.h

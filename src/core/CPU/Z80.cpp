@@ -1,16 +1,26 @@
 #include "core/CPU/Z80.hpp"
+#include "core/Memory/Bus.hpp"
 #include <iostream>
 
 // -------------------------------------------------------------
 // Constructor
 // -------------------------------------------------------------
-Z80::Z80()
-    : readMemory(nullptr), writeMemory(nullptr),
-      readIO(nullptr), writeIO(nullptr),
+Z80::Z80(Bus& busRef)
+    : readMemory(nullptr),
+      writeMemory(nullptr),
+      readIO(nullptr),
+      writeIO(nullptr),
+      bus(busRef),
       A(0), F(0), B(0), C(0), D(0), E(0), H(0), L(0),
-      IX(0), IY(0), PC(0), SP(0)
+      PC(0), SP(0), IX(0), IY(0),
+      halted(false),
+      interruptMode(0),
+      IFF1(false), IFF2(false)
 {
-    PC = 0x0000;
+}
+
+uint8_t Z80::CPURead(uint16_t addr) {
+  return bus.Read(addr);
 }
 
 // -------------------------------------------------------------
@@ -36,13 +46,14 @@ void Z80::Reset() {
 // Fetch Byte from memory
 // -------------------------------------------------------------
 uint8_t Z80::FetchByte() {
-    if (!readMemory) {
-        std::cerr << "Z80 Error: readMemory callback is null!\n";
-        return 0xFF;
-    }
-    uint8_t data = readMemory(PC);
-    PC++;
-    return data;
+  return CPURead(PC++);
+//    if (!readMemory) {
+//        std::cerr << "Z80 Error: readMemory callback is null!\n";
+//        return 0xFF;
+//    }
+//    uint8_t data = readMemory(PC);
+//    PC++;
+//    return data;
 }
 
 // -------------------------------------------------------------
@@ -111,6 +122,10 @@ uint32_t Z80::ExecuteInstruction() {
 
     if (opcode == 0xED) {
         return ExecuteED(FetchByte());
+    }
+
+    if (opcode == 0xFF) {
+      std::cout << "CRITICAL: CPU is executing Open Bus (0xFF) at PC: " << std::hex << PC << std::endl;
     }
 
     return ExecuteMain(opcode, useIX, useIY);
@@ -217,6 +232,73 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
     // ---------------------------------------------------------
     switch (opcode) {
 
+        case 0x37: { // SCF (Set Carry Flag)
+            // C is set, H and N are cleared
+            // S, Z, P/V are unaffected (though some documentation suggests H/N behaviour,
+            // the standard Z80 behaviour is H=0, N=0, C=1)
+            F |= FLAG_C;
+            F &= ~FLAG_H;
+            F &= ~FLAG_N;
+
+            LogOpcode(opcode, true, "SCF");
+            return ok(4);
+        }
+        case 0x3F: { // CCF (Complenment Carry Flag)
+            // H takes previous C, N is cleared, C is inverted
+            if (F & FLAG_C) {
+              F |= FLAG_H;
+              F &= ~FLAG_C;
+            } else {
+              F &= ~FLAG_H;
+              F |= FLAG_C;
+            }
+            F &= ~FLAG_N;
+
+            LogOpcode(opcode, true, "CCF");
+            return ok(4);
+        }
+        case 0xF9: { //LD SP, HL
+            SP = HLAddress();
+            LogOpcode(opcode, true, "LD SP, HL");
+            return ok(6);
+        }
+        case 0x22: { // LD (nn), HL
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            writeMemory(addr, L);
+            writeMemory(addr + 1, H);
+            LogOpcode(opcode, true, "LD (nn), HL");
+            return 16;
+        }
+        case 0xFA: { // JP M, nn
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            if (F & FLAG_S) {
+                PC = addr;
+            }
+            LogOpcode(opcode, true, "JP M, nn");
+            return 10;
+        }
+        case 0xC2: { // JP NZ, nn
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            if (!(F & FLAG_Z)) {
+                PC = addr;
+            }
+            LogOpcode(opcode, true, "JP NZ, nn");
+            return 10;
+        }
+        case 0x1A: { // LD A, (DE)
+            A = readMemory(DEAddress());
+            return ok(7); // Takes 7 T-states
+        }
+        case 0x12: { // LD (DE), A
+            writeMemory(DEAddress(), A);
+            return ok(7);
+        }
         case 0x00: // NOP
             return ok(4);
 
@@ -834,7 +916,52 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
             L = hl & 0xFF;
             return ok(6);
         }
+
+        case 0x2A: { // LD HL, (nn)
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            L = readMemory(addr);
+            H = readMemory(addr + 1);
+            LogOpcode(opcode, true, "LD HL, (nn)");
+            return 16;
+        }
         
+        case 0xF2: { // JP P, nn
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            if (!(F & FLAG_S)) {
+                PC = addr;
+            }
+            LogOpcode(opcode, true, "JP P, nn");
+            return 10;
+        }
+
+        case 0xC6: { // ADD A, n
+            uint8_t n = readMemory(PC++);
+            uint16_t result = A + n;
+            
+            // Update Flags
+            F = 0;
+            if ((result & 0xFF) == 0) F |= FLAG_Z;
+            if (result & 0x80) F |= FLAG_S;
+            if (result > 0xFF) F |= FLAG_C;
+            if (((A & 0x0F) + (n & 0x0F)) > 0x0F) F |= FLAG_H;
+            // Overflow flag (V)
+            if (((A ^ result) & (n ^ result) & 0x80)) F |= FLAG_P;
+            
+            A = result & 0xFF;
+            LogOpcode(opcode, true, "ADD A, n");
+            return 7;
+        }
+
+        case 0xE9: { // JP (HL)
+            PC = HLAddress();
+            LogOpcode(opcode, true, "JP (HL)");
+            return 4;
+        }
+
         case 0x3B: { // DEC SP
             SP--;
             return ok(6);
@@ -864,7 +991,7 @@ uint32_t Z80::ExecuteMain(uint8_t opcode, bool useIX, bool useIY) {
         }
 
         default:
-            std::printf("Unimplemented Main opcode: 0x%02X at PC: 0x%04X\n", opcode, PC - 1);
+        //    std::printf("Unimplemented Main opcode: 0x%02X at PC: 0x%04X\n", opcode, PC - 1);
             unimplementedInstructionCount++; // Use the main counter here
             return 4;
 
@@ -1000,6 +1127,84 @@ uint32_t Z80::ExecuteCB(uint8_t opcode) {
 // -------------------------------------------------------------
 uint32_t Z80::ExecuteED(uint8_t opcode) {
     switch (opcode) {
+        case 0xA3: { // OUTI
+            // 1. Read byte from (HL)
+            uint8_t data = readMemory(HLAddress());
+    
+            // 2. Output to port (C)
+            writeIO(C, data);
+    
+            // 3. Increment HL
+            uint16_t hl = HLAddress();
+            hl++;
+            H = (hl >> 8) & 0xFF;
+            L = hl & 0xFF;
+    
+            // 4. Decrement B
+            B--;
+    
+            // 5. Update Flags
+            // N is set, Z is set if B == 0
+            F |= FLAG_N;
+            if (B == 0) {
+                F |= FLAG_Z;
+            } else {
+                F &= ~FLAG_Z;
+            }
+            // Note: S, H, P/V flags are technically modified based on the 
+            // data written, but Z and N are the critical ones for MSX BIOS loops.
+
+            LogOpcode(opcode, true, "OUTI");
+            return 16; // Takes 16 T-states
+        }
+        case 0x51: { // OUT (C), D
+            writeIO(C, D);
+            LogOpcode(opcode, true, "OUT (C), D");
+            return 12;
+        }
+        case 0x4B: { // LD BC, (nn)
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            C = readMemory(addr);
+            B = readMemory(addr + 1);
+            LogOpcode(opcode, true, "LD BC, (nn)");
+            return 20;
+        }
+        case 0xB3: { // OTIR
+            // Execution is the same as OUTI, but PC decrements by 2 
+            // to repeat the instruction if B != 0
+            uint8_t data = readMemory(HLAddress());
+            writeIO(C, data);
+    
+            uint16_t hl = HLAddress();
+            hl++;
+            H = (hl >> 8) & 0xFF;
+            L = hl & 0xFF;
+    
+            B--;
+    
+            F |= FLAG_N;
+            if (B == 0) {
+                F |= FLAG_Z;
+                LogOpcode(opcode, true, "OTIR (Finished)");
+                return 16;
+            } else {
+                F &= ~FLAG_Z;
+                PC -= 2; // Repeat the ED B3 instruction
+                LogOpcode(opcode, true, "OTIR (Repeating)");
+                return 21; // Repeating takes 21 T-states
+            }
+        }
+        case 0x5B: { // LD DE, (nn)
+            uint8_t low = readMemory(PC++);
+            uint8_t high = readMemory(PC++);
+            uint16_t addr = (high << 8) | low;
+            E = readMemory(addr);
+            D = readMemory(addr + 1);
+            LogOpcode(opcode, true, "LD DE, (nn)");
+            return 20;
+        }
         case 0x44: { // NEG
             uint8_t oldA = A;
             A = 0 - A;
@@ -1034,18 +1239,25 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
             LogOpcode(opcode, true, "ED ");
             return 8;
         }
+
         case 0xA0: { // LDI
             uint8_t value = ReadHL();
             WriteDE(value);
-            uint16_t hl = HLAddress() + 1;
-            H = hl >> 8;
-            L = hl & 0xFF;
-            uint16_t de = DEAddress() + 1;
-            D = de >> 8;
-            E = de & 0xFF;
-            C--;
-            F &= ~(FLAG_H | FLAG_P | FLAG_N);
-            if (C != 0) F |= FLAG_P;
+    
+            // Increment HL and DE
+            uint16_t hl = (uint16_t)((H << 8) | L) + 1;
+            H = hl >> 8; L = hl & 0xFF;
+            uint16_t de = (uint16_t)((D << 8) | E) + 1;
+            D = de >> 8; E = de & 0xFF;
+    
+            // Decrement BC
+            uint16_t bc = (uint16_t)((B << 8) | C) - 1;
+            B = bc >> 8; C = bc & 0xFF;
+    
+            // Update Flags
+            F &= ~(FLAG_H | FLAG_N | FLAG_P);
+            if (bc != 0) F |= FLAG_P; // PV flag set if BC != 0
+    
             LogOpcode(opcode, true, "ED ");
             return 16;
         }
@@ -1119,7 +1331,7 @@ uint32_t Z80::ExecuteED(uint8_t opcode) {
             return 16; // Last iteration
         }
         default:
-            std::printf("Unimplemented ED opcode: 0x%02X at PC: 0x%04X\n", opcode, PC -1);
+        //    std::printf("Unimplemented ED opcode: 0x%02X at PC: 0x%04X\n", opcode, PC -1);
             unimplementedEDCount++;
             return 8;
     }
@@ -1395,7 +1607,9 @@ void Z80::HandleInterrupt() {
         IFF1 = IFF2 = false; // Disable further interrupts
         
         PushWord(PC);        // Save current address to return later
-        PC = INT_VECTOR;     // Jump to MSX BIOS interrupt handler (0x0038)
+//        PC = INT_VECTOR;     // Jump to MSX BIOS interrupt handler (0x0038)
+        PC = 0x0038;
+        //std::cout << "DEBUG: INTERRUPT FORCED!" << std::endl;
         
         // Note: In a real Z80, this takes roughly 13 T-states
     }

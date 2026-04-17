@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/erwin/source/source/8-bit/Z80/z80-Cpp/msx-emulator/src/main.cpp" "CMakeFiles/msx-emulator.dir/src/main.cpp.o" "gcc" "CMakeFiles/msx-emulator.dir/src/main.cpp.o.d"
+  "/home/erwin/MSX1-Cpp/src/main.cpp" "CMakeFiles/msx-emulator.dir/src/main.cpp.o" "gcc" "CMakeFiles/msx-emulator.dir/src/main.cpp.o.d"
   "" "msx-emulator" "gcc" "CMakeFiles/msx-emulator.dir/link.d"
   )
 

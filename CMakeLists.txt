@@ -37,23 +37,25 @@ find_package(Threads REQUIRED)
 
 target_link_libraries(msx_emulator_core PUBLIC Threads::Threads)
 
+# SDL2 for graphical output
+find_package(SDL2 REQUIRED)
+
 # Executable target
 add_executable(msx-emulator src/main.cpp)
-target_link_libraries(msx-emulator PRIVATE msx_emulator_core Threads::Threads)
 
-# Fetch GoogleTest for unit/integration tests
-include(FetchContent)
-
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+# Link everything to the executable
+target_link_libraries(msx-emulator
+    PRIVATE
+        msx_emulator_core
+        Threads::Threads
+        ${SDL2_LIBRARIES}
 )
 
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+# Set include directories for the executable
+target_include_directories(msx-emulator
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+        ${SDL2_INCLUDE_DIRS}
+)
 
-# Enable testing support
-include(CTest)
-enable_testing()
-
-add_subdirectory(tests)
+# --- End of File ---
